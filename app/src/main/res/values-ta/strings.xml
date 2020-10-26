@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="customer_name">வாடிக்கையாளர் பெயர்</string>
+    <string name="customer_address">வாடிக்கையாளர் முகவரி</string>
+    <string name="destination">இலக்கு</string>
+    <string name="quantity">அளவு</string>
+    <string name="capture_location">பிடிப்பு இடம்</string>
+    <string name="location">இடம்</string>
+    <string name="lr_number">LR எண்</string>
+    <string name="receiver_1">பெறுநர் #1</string>
+    <string name="name">பெயர்</string>
+    <string name="mobile">கைபேசி#</string>
+    <string name="bags">பைகள்#</string>
+    <string name="notes">குறிப்புகள்</string>
+    <string name="sign">கையொப்பம்</string>
+    <string name="submit">சமர்ப்பிக்கவும்</string>
+    <string name="receiver_2">பெறுநர் #2</string>
+    <string name="receiver_3">பெறுநர் #3</string>
+    <string name="invoice_details">விலைப்பட்டியல் விவரங்கள்</string>
+    <string name="choose_language">ஒரு மொழியைத் தேர்வுசெய்க</string>
+    <string name="get_started">தொடங்கவும்</string>
+
+    <string name="required_permission_title">Required Permission</string>
+    <string name="accept">Accept</string>
+    <string name="close">Close</string>
+    <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul><li>&nbsp;Location to capture appropriate delivery point and delivery visibility to our customer.</li><li>&nbsp;Camera and Storage to facilitate you upload stamped invoice copy.</li></ul>]]></string>
+
+</resources>

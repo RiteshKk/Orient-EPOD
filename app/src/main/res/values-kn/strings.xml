@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="customer_name">ಗ್ರಾಹಕ ಹೆಸರು</string>
+    <string name="customer_address">ಗ್ರಾಹಕರ ವಿಳಾಸ</string>
+    <string name="destination">ತಲುಪುವ ದಾರಿ</string>
+    <string name="quantity">ಪ್ರಮಾಣ</string>
+    <string name="capture_location">ಸ್ಥಳವನ್ನು ಸೆರೆಹಿಡಿಯಿರಿ</string>
+    <string name="location">ಸ್ಥಳ</string>
+    <string name="lr_number">LR ಸಂಖ್ಯೆ</string>
+    <string name="receiver_1">ಸ್ವೀಕರಿಸುವವರು #1</string>
+    <string name="name">ಹೆಸರು</string>
+    <string name="mobile">ಮೊಬೈಲ್#</string>
+    <string name="bags">ಚೀಲಗಳು#</string>
+    <string name="notes">ಟಿಪ್ಪಣಿಗಳು</string>
+    <string name="sign">ಸೈನ್ ಮಾಡಿ</string>
+    <string name="submit">ಸಲ್ಲಿಸು</string>
+    <string name="receiver_2">ಸ್ವೀಕರಿಸುವವರು #2</string>
+    <string name="receiver_3">ಸ್ವೀಕರಿಸುವವರು #3</string>
+    <string name="invoice_details">ಸರಕುಪಟ್ಟಿ ವಿವರಗಳು</string>
+    <string name="choose_language">ಭಾಷೆಯನ್ನು ಆರಿಸಿ</string>
+    <string name="get_started">ಪ್ರಾರಂಭಿಸಿ</string>
+
+    <string name="required_permission_title">Required Permission</string>
+    <string name="accept">Accept</string>
+    <string name="close">Close</string>
+    <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul><li>&nbsp;Location to capture appropriate delivery point and delivery visibility to our customer.</li><li>&nbsp;Camera and Storage to facilitate you upload stamped invoice copy.</li></ul>]]></string>
+
+</resources>

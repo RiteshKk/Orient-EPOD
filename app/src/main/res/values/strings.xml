@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">Orient-EPOD</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="customer_address">Customer Address</string>
+    <string name="destination">Destination</string>
+    <string name="quantity">Quantity</string>
+    <string name="capture_location">Capture Location</string>
+    <string name="location">Location</string>
+    <string name="lr_number">LR Number</string>
+    <string name="permission_rationale">Location and Camera permission is needed as core functionality</string>
+    <string name="name">Name</string>
+    <string name="mobile">Mobile#</string>
+    <string name="bags">Bags#</string>
+    <string name="notes">Notes</string>
+    <string name="sign">Sign (Click below Image to sign)</string>
+    <string name="submit">Submit</string>
+
+    <string name="invoice_details">Invoice Details</string>
+    <string name="choose_language">Choose a Language</string>
+    <string name="get_started">Get Started</string>
+    <string name="required_permission_title">Required Permission</string>
+    <string name="accept">Accept</string>
+    <string name="close">Close</string>
+    <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul><li>&nbsp;Location to capture appropriate delivery point and delivery visibility to our customer.</li><li>&nbsp;Camera and Storage to facilitate you upload stamped invoice copy.</li></ul>]]></string>
+    <string name="driver_portal">Driver Portal</string>
+    <string name="transporter_code">Transporter Code</string>
+    <string name="truck_number">Truck Number</string>
+    <string name="login">Login</string>
+    <string name="our_vision">Our Vision : \"Build Sustainably\"</string>
+    <string name="invoice_no">Invoice No.</string>
+    <string name="invoice_date">Invoice Date</string>
+    <string name="display_lr">Display LR</string>
+    <string name="download">Download</string>
+    <string name="invoices_for_epod">Invoices for EPOD</string>
+    <string name="logout">Logout</string>
+    <string name="title_activity_tabbed">TabbedActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="bags_received">Bags Received</string>
+    <string name="remarks">Remarks (If Any)</string>
+    <string name="bags_damage">Shortage/Damage (Bags/Qty)</string>
+    <string name="total_shortage">Total Shortage/Damage(Bag/MT)</string>
+    <string name="scan_doc">Scan Documents If any</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="submit_epod">Submit EPOD</string>
+    <string name="cancel">cancel</string>
+    <string name="clear">clear</string>
+
+    <string-array name="bags_spinner">
+        <item>Bags</item>
+        <item>MT</item>
+    </string-array>
+</resources>

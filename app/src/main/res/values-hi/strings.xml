@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="choose_language">एक भाषा चुनें</string>
+    <string name="customer_name">ग्राहक का नाम</string>
+    <string name="customer_address">ग्राहक का पता</string>
+    <string name="destination">गंतव्य</string>
+    <string name="quantity">मात्रा</string>
+    <string name="capture_location">स्थान चिह्नित करें</string>
+    <string name="location">स्थान</string>
+    <string name="lr_number">LR संख्या</string>
+    <string name="receiver_1">प्राप्तकर्ता #1</string>
+    <string name="name">नाम</string>
+    <string name="mobile">मोबाइल#</string>
+    <string name="bags">बैग#</string>
+    <string name="notes">नोट्स</string>
+    <string name="sign">हस्ताक्षर</string>
+    <string name="submit">जमा करें</string>
+    <string name="receiver_2">प्राप्तकर्ता #2</string>
+    <string name="receiver_3">प्राप्तकर्ता #3</string>
+    <string name="invoice_details">चालान विवरण</string>
+    <string name="get_started">कृपया शुरू करें</string>
+
+    <string name="required_permission_title">आवश्यक अनुमति</string>
+    <string name="accept">स्वीकार करें</string>
+    <string name="close">बंद करे</string>
+    <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul><li>&nbsp;Location to capture appropriate delivery point and delivery visibility to our customer.</li><li>&nbsp;Camera and Storage to facilitate you upload stamped invoice copy.</li></ul>]]></string>
+
+</resources>
