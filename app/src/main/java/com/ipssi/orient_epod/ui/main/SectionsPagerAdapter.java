@@ -27,7 +27,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
-        boolean isEditable = false;
+//        boolean isEditable = false;
        /* Receiver receiver = mModel.getReceivers().get(position);
 
         if (receiver == null && position == 0) {
@@ -35,7 +35,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         } else if (position > 0 && receiver == null && mModel.getReceivers().get(position - 1) != null) {
             isEditable = true;
         }*/
-        return PlaceholderFragment.newInstance(new Receiver(), isEditable);
+        return PlaceholderFragment.newInstance(mModel.getInvoiceNumber());
     }
 
     @Nullable

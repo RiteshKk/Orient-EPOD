@@ -50,6 +50,7 @@
             android:gravity="center"
             android:hint="@string/transporter_code"
             android:padding="7dp"
+            android:inputType="number"
             android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -68,6 +69,8 @@
             android:hint="@string/truck_number"
             android:padding="7dp"
             android:singleLine="true"
+            android:textAllCaps="true"
+            android:inputType="textCapCharacters"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/transporter_code" />

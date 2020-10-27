@@ -4,13 +4,43 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Receiver implements Parcelable {
-    private String name;
-    private String number;
-    private String bagsReceived;
-    private String shortage;
-    private int shortageType;
 
-    public Receiver(){}
+    public Receiver(String name, String phone, String invoiceNumber, String bagsRecv, String shortage, int loadType, String remarks, String sign, int isComplete, String location) {
+        this.name = name;
+        this.phone = phone;
+        this.invoiceNumber = invoiceNumber;
+        this.bagsRecv = bagsRecv;
+        this.shortage = shortage;
+        this.loadType = loadType;
+        this.remarks = remarks;
+        this.sign = sign;
+        this.isComplete = isComplete;
+        this.location = location;
+    }
+
+    private String name;
+    private String phone;
+    private String invoiceNumber;
+    private String bagsRecv;
+    private String shortage;
+    private int loadType;
+    private String remarks;
+    private String sign;
+    private int isComplete;
+    private String location;
+
+    protected Receiver(Parcel in) {
+        name = in.readString();
+        phone = in.readString();
+        invoiceNumber = in.readString();
+        bagsRecv = in.readString();
+        shortage = in.readString();
+        loadType = in.readInt();
+        remarks = in.readString();
+        sign = in.readString();
+        isComplete = in.readInt();
+        location = in.readString();
+    }
 
     public static final Creator<Receiver> CREATOR = new Creator<Receiver>() {
         @Override
@@ -24,75 +54,6 @@ public class Receiver implements Parcelable {
         }
     };
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getBagsReceived() {
-        return bagsReceived;
-    }
-
-    public void setBagsReceived(String bagsReceived) {
-        this.bagsReceived = bagsReceived;
-    }
-
-    public String getShortage() {
-        return shortage;
-    }
-
-    public void setShortage(String shortage) {
-        this.shortage = shortage;
-    }
-
-    public int getShortageType() {
-        return shortageType;
-    }
-
-    public void setShortageType(int shortageType) {
-        this.shortageType = shortageType;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    private String remarks;
-    private String signature;
-
-    private Receiver(Parcel parcel) {
-        name = parcel.readString();
-        number = parcel.readString();
-        bagsReceived = parcel.readString();
-        shortage = parcel.readString();
-        shortageType = parcel.readInt();
-        remarks = parcel.readString();
-        signature = parcel.readString();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -101,11 +62,14 @@ public class Receiver implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
-        dest.writeString(number);
-        dest.writeString(bagsReceived);
+        dest.writeString(phone);
+        dest.writeString(invoiceNumber);
+        dest.writeString(bagsRecv);
         dest.writeString(shortage);
-        dest.writeInt(shortageType);
+        dest.writeInt(loadType);
         dest.writeString(remarks);
-        dest.writeString(signature);
+        dest.writeString(sign);
+        dest.writeInt(isComplete);
+        dest.writeString(location);
     }
 }
