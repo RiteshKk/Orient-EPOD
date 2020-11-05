@@ -1,19 +1,22 @@
 package com.ipssi.orient_epod.ui.main;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,32 +33,41 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.ipssi.orient_epod.R;
 import com.ipssi.orient_epod.adapter.ImageAdapter;
+import com.ipssi.orient_epod.callbacks.OnImageDeleteClickListener;
 import com.ipssi.orient_epod.capturesignature.OnSignedCaptureListener;
 import com.ipssi.orient_epod.capturesignature.SignatureDialogFragment;
 import com.ipssi.orient_epod.databinding.FragmentTabbedBinding;
 import com.ipssi.orient_epod.location.LocationAPI;
 import com.ipssi.orient_epod.location.OnLocationChangeCallBack;
+import com.ipssi.orient_epod.model.Invoice;
+import com.ipssi.orient_epod.model.Receiver;
+import com.ipssi.orient_epod.model.UploadDocumentEntity;
+import com.ipssi.orient_epod.remote.remote.util.Resource;
+import com.ipssi.orient_epod.remote.util.AppConstant;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
+import static com.ipssi.orient_epod.UtilKt.showAlertDialog;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlaceholderFragment extends Fragment implements OnSignedCaptureListener, OnLocationChangeCallBack {
+public class PlaceholderFragment extends Fragment implements OnSignedCaptureListener, OnLocationChangeCallBack, OnImageDeleteClickListener {
 
     private FragmentTabbedBinding binding;
     private LocationAPI locationApi;
     private ImageAdapter adapter;
     private SharedPreferences permissionStatus;
     private PageViewModel viewModel;
-    private boolean isSubmit = false;
+    private boolean isFinalSubmit = false;
 
-    public static PlaceholderFragment newInstance(String invoiceNumber) {
+    public static PlaceholderFragment newInstance(Invoice invoice, Receiver receiver) {
         Bundle bundle = new Bundle();
-        bundle.putString("invoice", invoiceNumber);
+        bundle.putParcelable(AppConstant.INVOICE, invoice);
+        bundle.putParcelable(AppConstant.RECEIVER, receiver);
         PlaceholderFragment fragment = new PlaceholderFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -76,113 +88,189 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         permissionStatus = requireContext().getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
 
         viewModel = new ViewModelProvider(this).get(PageViewModel.class);
-
+        binding.setViewModel(viewModel);
         locationApi = new LocationAPI(requireActivity(), this);
+
+        init();
 
         handleClickListener();
 
-        setTextWatcher();
+        setObserver();
         binding.imageList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        adapter = new ImageAdapter();
+        adapter = new ImageAdapter(this);
         binding.imageList.setAdapter(adapter);
+
+        getUploadedDocs();
+    }
+
+    private void getUploadedDocs() {
+        if (getArguments() != null) {
+            Invoice invoice = getArguments().getParcelable(AppConstant.INVOICE);
+            viewModel.fetchUploadedImage(invoice);
+        }
+    }
+
+    private void init() {
+        Receiver receiver = Objects.requireNonNull(getArguments()).getParcelable(AppConstant.RECEIVER);
+        if (receiver != null) {
+            viewModel.getName().setValue(receiver.getName());
+            viewModel.getMobile().setValue(receiver.getMobile());
+            viewModel.getBagsReceived().setValue(receiver.getBagsRecv());
+            viewModel.getDamageBags().setValue(receiver.getShortage());
+            binding.bagsSpinner.setSelection(receiver.getLoadType());
+            viewModel.getRemarks().setValue(receiver.getRemarks());
+            byte[] decode = Base64.decode(receiver.getSign(), Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
+            viewModel.getSignature().setValue(bitmap);
+            viewModel.isEditable().setValue(false);
+        }
+    }
+
+    private void setObserver() {
+        viewModel.isEditable().observe(getViewLifecycleOwner(), (isEnabled) -> {
+            binding.bagsSpinner.setEnabled(isEnabled);
+            binding.btnSubmit.setEnabled(isEnabled);
+            binding.btnSubmitEpod.setEnabled(isEnabled);
+        });
+        viewModel.getSignature().observe(getViewLifecycleOwner(), (bitmap) -> binding.sign.setImageBitmap(bitmap));
+        viewModel.getName().observe(getViewLifecycleOwner(), s -> binding.layoutName.setError(null));
+        viewModel.getMobile().observe(getViewLifecycleOwner(), s -> binding.layoutMobile.setError(null));
+        viewModel.getBagsReceived().observe(getViewLifecycleOwner(), s -> binding.layoutBags.setError(null));
+        viewModel.getDamageBags().observe(getViewLifecycleOwner(), s -> binding.layoutDamageBags.setError(null));
+        viewModel.getUploadStatus().observe(getViewLifecycleOwner(), (imageResponseResource) -> {
+            switch (imageResponseResource.getStatus()) {
+                case LOADING:
+                    showSnackbar(getString(R.string.uploading_image));
+                    break;
+                case ERROR:
+                    showSnackbar(imageResponseResource.getMessage());
+                    break;
+                case OFFLINE:
+                    showAlertDialog(requireActivity(), imageResponseResource.getMessage());
+                    break;
+                case SUCCESS:
+                    showSnackbar(getString(R.string.uploaded));
+                    adapter.setImages(viewModel.getImageList().getValue().getData());
+                    break;
+            }
+        });
+
+        viewModel.getImageDeleteObserver().observe(getViewLifecycleOwner(), (epodResponseResource) -> {
+            switch (epodResponseResource.getStatus()) {
+                case ERROR:
+                case OFFLINE:
+                    showAlertDialog(requireActivity(), epodResponseResource.getMessage());
+                    break;
+                case LOADING:
+                    break;
+                case SUCCESS:
+                    Snackbar.make(binding.getRoot(), epodResponseResource.getData().getMessage(), Snackbar.LENGTH_SHORT).show();
+                    break;
+
+
+            }
+        });
+
+        viewModel.getImageList().observe(getViewLifecycleOwner(), (imageList) -> {
+            switch (imageList.getStatus()) {
+                case LOADING:
+                    viewModel.isLoading().setValue(true);
+                    break;
+                case ERROR:
+                case OFFLINE:
+                    viewModel.isLoading().setValue(false);
+                    showAlertDialog(requireActivity(), imageList.getMessage());
+                    break;
+                case SUCCESS:
+                    viewModel.isLoading().setValue(false);
+                    adapter.setImages(imageList.getData());
+                    break;
+            }
+        });
+
+        viewModel.getSaveReceiverResponse().observe(getViewLifecycleOwner(), saveReceiverResponse -> {
+            switch (saveReceiverResponse.getStatus()) {
+                case SUCCESS:
+                    Snackbar.make(binding.getRoot(), saveReceiverResponse.getData().getMessage(), Snackbar.LENGTH_SHORT).show();
+                    if (isFinalSubmit) {
+                        new Handler().postDelayed(() -> requireActivity().finish(), 2000
+                        );
+                    }
+                    viewModel.isLoading().setValue(false);
+                    break;
+                case ERROR:
+                case OFFLINE:
+                    viewModel.isLoading().setValue(false);
+                    showAlertDialog(requireActivity(), saveReceiverResponse.getMessage());
+                    break;
+                case LOADING:
+                    viewModel.isLoading().setValue(true);
+                    break;
+            }
+        });
+    }
+
+
+    private void handleClickListener() {
         binding.sign.setOnClickListener(v -> {
             SignatureDialogFragment dialogFragment = new SignatureDialogFragment(PlaceholderFragment.this);
             dialogFragment.show(getChildFragmentManager(), "signature");
         });
-    }
 
-    private void setTextWatcher() {
-        binding.layoutName.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        binding.btnSubmit.setOnClickListener(v -> onSubmitClick());
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                binding.layoutName.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
+        binding.btnSubmitEpod.setOnClickListener(v -> {
+            showCompleteTripAlertDialog();
         });
-        binding.layoutMobile.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                binding.layoutMobile.setError(null);
+        binding.btnCaptureImage.setOnClickListener(v -> {
+            Resource<ArrayList<UploadDocumentEntity>> value = viewModel.getImageList().getValue();
+            if (value == null || value.getData() == null || value.getData().size() < 3) {
+                checkPermissionAndCaptureImage();
+            } else {
+                showSnackbar(getString(R.string.max_3_allowed));
             }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
-        binding.layoutBags.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                binding.layoutBags.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
-        binding.layoutDamageBags.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                binding.layoutDamageBags.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
         });
     }
 
-    private void handleClickListener() {
-        binding.btnSubmit.setOnClickListener(v -> {
-            isSubmit = true;
-            binding.getRoot().clearFocus();
-            String name = Objects.requireNonNull(binding.layoutName.getEditText()).getText().toString();
-            if (name.isEmpty()) {
-                binding.layoutName.setError("Please fill name");
-                return;
-            }
-            String mobile = Objects.requireNonNull(binding.layoutMobile.getEditText()).getText().toString();
-            if (mobile.isEmpty()) {
-                binding.layoutMobile.setError("Please fill number");
-                return;
-            }
-            String bagsReceived = Objects.requireNonNull(binding.layoutBags.getEditText()).getText().toString();
-            if (bagsReceived.isEmpty()) {
-                binding.layoutBags.setError("Please fill bags count");
-                return;
-            }
-            String shortage = Objects.requireNonNull(binding.layoutDamageBags.getEditText()).getText().toString();
-            if (shortage.isEmpty()) {
-                binding.layoutDamageBags.setError("Please fill shortage/damages(fill 0 if no shortage/damage)");
-                return;
-            }
+    private void showCompleteTripAlertDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setMessage(R.string.sure_to_complete)
+            .setTitle(R.string.submit_epod)
+            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                isFinalSubmit = true;
+                onSubmitClick();
+            })
+            .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+            .show();
 
-            Bitmap image = ((BitmapDrawable) binding.sign.getDrawable()).getBitmap();
-            if (image == null) {
-                Snackbar.make(binding.getRoot(), "Please provide Signature", Snackbar.LENGTH_SHORT).show();
-                return;
+    }
+
+    public void checkPermissionAndCaptureImage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                dispatchTakePictureIntent();
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                    alert.setMessage(R.string.storage_required)
+                        .setPositiveButton(R.string.allow, (DialogInterface dialogInterface, int i) -> requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2))
+                        .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss()).show();
+                } else if (permissionStatus.getBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, false)) {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
+                    intent.setData(uri);
+                    startActivityForResult(intent, 2);
+                } else {
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                }
+                SharedPreferences.Editor editor = permissionStatus.edit();
+                editor.putBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, true);
+                editor.apply();
             }
-            checkPermissionAndGetLocation();
-        });
-
-        viewModel.getSaveReceiverResponse().observe(getViewLifecycleOwner(), saveReceiverResponse -> {
-            Snackbar.make(binding.getRoot(), saveReceiverResponse.getMessage(), Snackbar.LENGTH_SHORT).show();
-        });
-
-        binding.btnCaptureLocation.setOnClickListener(v -> {
-            checkPermissionAndGetLocation();
-        });
-        binding.btnUploadImage.setOnClickListener(v -> dispatchTakePictureIntent());
+        } else {
+            dispatchTakePictureIntent();
+        }
     }
 
     private void checkPermissionAndGetLocation() {
@@ -198,6 +286,46 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         }
     }
 
+    private void onSubmitClick() {
+        binding.getRoot().clearFocus();
+        String name = Objects.requireNonNull(binding.layoutName.getEditText()).getText().toString();
+        if (name.isEmpty()) {
+            binding.layoutName.setError(getString(R.string.field_cant_be_empty));
+            return;
+        }
+        String mobile = Objects.requireNonNull(binding.layoutMobile.getEditText()).getText().toString();
+        if (mobile.isEmpty()) {
+            binding.layoutMobile.setError(getString(R.string.field_cant_be_empty));
+            return;
+        } else if (mobile.length() != 10) {
+            binding.layoutMobile.setError(getString(R.string.enter_valid_number));
+            return;
+        }
+        String bagsReceived = Objects.requireNonNull(binding.layoutBags.getEditText()).getText().toString();
+        if (bagsReceived.isEmpty()) {
+            binding.layoutBags.setError(getString(R.string.field_cant_be_empty));
+            return;
+        }
+        String shortage = Objects.requireNonNull(binding.layoutDamageBags.getEditText()).getText().toString();
+        if (shortage.isEmpty()) {
+            binding.layoutDamageBags.setError(getString(R.string.enter_shortage));
+            return;
+        }
+
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) binding.sign.getDrawable();
+        if (bitmapDrawable == null) {
+            Snackbar.make(binding.getRoot(), R.string.provide_signature, Snackbar.LENGTH_SHORT).show();
+            return;
+        } else {
+            Bitmap image = (bitmapDrawable).getBitmap();
+            if (image == null) {
+                Snackbar.make(binding.getRoot(), R.string.provide_signature, Snackbar.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        checkPermissionAndGetLocation();
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     private void requestPermissions() {
@@ -209,7 +337,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                     requestPermissions(
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         102));
-        } else if (permissionStatus.getBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, false)) {
+        } else if (permissionStatus.getBoolean(Manifest.permission.ACCESS_FINE_LOCATION, false)) {
             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
             intent.setData(uri);
@@ -221,7 +349,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         }
 
         SharedPreferences.Editor editor = permissionStatus.edit();
-        editor.putBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, true);
+        editor.putBoolean(Manifest.permission.ACCESS_FINE_LOCATION, true);
         editor.apply();
     }
 
@@ -230,21 +358,20 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         Snackbar.make(binding.getRoot(), getString(mainTextStringId), Snackbar.LENGTH_INDEFINITE).setAction(getString(actionStringId), listener).show();
     }
 
+    private void showSnackbar(String mainTextString) {
+        Snackbar.make(binding.getRoot(), mainTextString, Snackbar.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onSignatureCaptured(Bitmap bitmap, String fileUri) {
-        binding.sign.setImageBitmap(bitmap);
+        viewModel.getSignature().setValue(bitmap);
     }
 
     @Override
     public void onLocationChange(Location loc) {
-        if (isSubmit) {
-            if (getArguments() != null) {
-                String invoiceNumber = getArguments().getString("invoice", "");
-                viewModel.saveReceiver(binding.layoutName.getEditText().getText().toString(), binding.layoutMobile.getEditText().getText().toString(), invoiceNumber, binding.layoutBags.getEditText().getText().toString(), binding.layoutDamageBags.getEditText().getText().toString(), binding.bagsSpinner.getSelectedItemPosition(), binding.layoutNotes.getEditText().getText().toString(), ((BitmapDrawable) binding.sign.getDrawable()).getBitmap(),loc);
-            }
-            isSubmit = false;
-        } else {
-            Snackbar.make(binding.getRoot(), "Lat : " + loc.getLatitude() + " ,Lng : " + loc.getLongitude(), Snackbar.LENGTH_SHORT).show();
+        if (getArguments() != null) {
+            Invoice invoice = getArguments().getParcelable(AppConstant.INVOICE);
+            viewModel.saveReceiver(invoice.getInvoiceNumber(), binding.bagsSpinner.getSelectedItemPosition(), loc, isFinalSubmit);
         }
         locationApi.onStop();
     }
@@ -255,6 +382,8 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 102 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             locationApi.onStart();
+        } else if (requestCode == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            dispatchTakePictureIntent();
         }
     }
 
@@ -264,22 +393,6 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(requireContext().getPackageManager()) != null) {
-
-
-            // Create the File where the photo should go
-          /*  File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(requireContext(),
-                    "com.ipssi.driver_opod.fileprovider",
-                    photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                }*/
             startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
         }
     }
@@ -288,56 +401,16 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            adapter.setImages(imageBitmap);
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            Invoice invoice = Objects.requireNonNull(getArguments()).getParcelable(AppConstant.INVOICE);
+            viewModel.uploadImage(bitmap, invoice);
         } else if (requestCode == 102 && resultCode == RESULT_OK) {
             locationApi.onStart();
         }
     }
 
-//    String currentPhotoPath;
-
-    /*private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-            imageFileName,  *//* prefix *//*
-            ".jpg",         *//* suffix *//*
-            storageDir      *//* directory *//*
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }*/
-
-
-//    private void setPic() {
-//        // Get the dimensions of the View
-//        int targetW = imageView.getWidth();
-//        int targetH = imageView.getHeight();
-//
-//        // Get the dimensions of the bitmap
-//        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//        bmOptions.inJustDecodeBounds = true;
-//
-//        BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
-//
-//        int photoW = bmOptions.outWidth;
-//        int photoH = bmOptions.outHeight;
-//
-//        // Determine how much to scale down the image
-//        int scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH));
-//
-//        // Decode the image file into a Bitmap sized to fill the View
-//        bmOptions.inJustDecodeBounds = false;
-//        bmOptions.inSampleSize = scaleFactor;
-//        bmOptions.inPurgeable = true;
-//
-//        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
-//        imageView.setImageBitmap(bitmap);
-//    }
+    @Override
+    public void onImageDeleteClick(UploadDocumentEntity entity) {
+        viewModel.deleteUploadedImage(entity);
+    }
 }

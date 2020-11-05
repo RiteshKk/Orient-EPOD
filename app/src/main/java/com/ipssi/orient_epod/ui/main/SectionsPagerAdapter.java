@@ -6,7 +6,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.ipssi.orient_epod.model.Invoice;
-import com.ipssi.orient_epod.model.Receiver;
+
+import java.util.ArrayList;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
@@ -15,11 +16,11 @@ import com.ipssi.orient_epod.model.Receiver;
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
 
-    private Invoice mModel;
+    private ArrayList<PlaceholderFragment> mFragmentList;
 
-    public SectionsPagerAdapter(FragmentManager fm, Invoice model) {
+    public SectionsPagerAdapter(FragmentManager fm, ArrayList<PlaceholderFragment> fragmentList) {
         super(fm);
-        mModel = model;
+        mFragmentList = fragmentList;
 
     }
 
@@ -35,7 +36,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         } else if (position > 0 && receiver == null && mModel.getReceivers().get(position - 1) != null) {
             isEditable = true;
         }*/
-        return PlaceholderFragment.newInstance(mModel.getInvoiceNumber());
+        return mFragmentList.get(position);
     }
 
     @Nullable
@@ -47,7 +48,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // Show 3 total pages.
-//        return mModel.getReceiversCount();
         return 3;
     }
 }

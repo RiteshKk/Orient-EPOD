@@ -2,18 +2,19 @@ package com.ipssi.orient_epod
 
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
 import com.ipssi.orient_epod.adapter.InvoiceAdapter
 import com.ipssi.orient_epod.callbacks.OnInvoiceSelectedListener
 import com.ipssi.orient_epod.databinding.FragmentMainBinding
+import com.ipssi.orient_epod.location.CoreUtility
+import com.ipssi.orient_epod.location.LocationUtils
 import com.ipssi.orient_epod.login.SharedViewModel
 import com.ipssi.orient_epod.model.Credentials
 import com.ipssi.orient_epod.model.Invoice
@@ -21,32 +22,64 @@ import com.ipssi.orient_epod.remote.remote.util.Status
 import com.ipssi.orient_epod.remote.util.AppConstant
 
 
-class HomeFragment : Fragment(), OnInvoiceSelectedListener {
+class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLocationListener {
 
     private lateinit var binding: FragmentMainBinding
     private lateinit var viewModel: SharedViewModel
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
-        observeModel()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentMainBinding.inflate(inflater, container, false)
+        viewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
+        observeModel()
         binding.invoiceList.adapter = InvoiceAdapter(this)
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.swipeContainer.setOnRefreshListener {
+            getUpdatedData()
+            binding.swipeContainer.isRefreshing = false
+        }
+    }
+
     override fun onStart() {
         super.onStart()
+        getUpdatedData()
+        handleBackPress()
+        // for Continuous Location update
+        /*if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
+            if (CoreUtility.isLocationOn(requireContext())) {
+                configureService(requireContext())
+                CoreUtility.startBackgroundWorker()
+            } else {
+                CoreUtility.enableLocation(requireContext(), this)
+            }
+        } else {
+            CoreUtility.requestPermissions(requireActivity(), 2001)
+        }*/
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 2001 && grantResults[0] == PERMISSION_GRANTED) {
+            if (CoreUtility.isLocationOn(requireContext())) {
+                configureService(requireContext())
+                CoreUtility.startBackgroundWorker()
+            } else {
+                CoreUtility.enableLocation(requireContext(), this)
+            }
+        }
+    }
+
+    private fun getUpdatedData() {
         val sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)
         val tCode = sharedPreferences.getString(AppConstant.TRANSPORTER_CODE, "") ?: ""
         val vehicleName = sharedPreferences.getString(AppConstant.VEHICLE_NUMBER, "") ?: ""
         viewModel.getShipmentDetails(Credentials(transporterCode = tCode, vehicleNo = vehicleName))
-        handleBackPress()
     }
 
     override fun onInvoiceSelected(invoice: Invoice?) {
@@ -56,8 +89,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener {
     }
 
     override fun onLrIconClicked(link: String?) {
-        binding.pdfView.fromAsset("output.pdf").load()
-        binding.lrViewLayout.visibility = View.VISIBLE
+        childFragmentManager.beginTransaction().addToBackStack("").replace(R.id.container, WebViewFragment.newInstance(link)).commit()
     }
 
 
@@ -65,9 +97,8 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener {
         binding.root.requestFocus()
         binding.root.isFocusableInTouchMode = true
         binding.root.setOnKeyListener { _, keyCode, _ ->
-            if (keyCode == KeyEvent.KEYCODE_BACK && binding.lrViewLayout.visibility == View.VISIBLE) {
-                binding.lrViewLayout.visibility = View.GONE
-                true
+            if (keyCode == KeyEvent.KEYCODE_BACK && childFragmentManager.backStackEntryCount > 0) {
+                childFragmentManager.popBackStackImmediate()
             } else false
         }
     }
@@ -87,19 +118,21 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener {
                     }
                     Status.ERROR -> {
                         viewModel.isLoading.value = false
-                        Snackbar.make(binding.root, AppConstant.SERVER_ERROR, Snackbar.LENGTH_LONG)
-                            .show()
+                        showAlertDialog(requireActivity(), resource.message)
                     }
                     Status.OFFLINE -> {
                         viewModel.isLoading.value = false
-                        Snackbar.make(binding.root, AppConstant.OFFLINE_ERROR, Snackbar.LENGTH_LONG)
-                            .show()
-                    }
-                    else -> {
-                        Log.d("LoginActivity", "else block")
+                        showAlertDialog(requireActivity(), resource.message)
                     }
                 }
             }
         })
+    }
+
+    override fun locationStatus(isTurnOn: Boolean) {
+        if (isTurnOn) {
+            configureService(requireContext())
+            CoreUtility.startBackgroundWorker()
+        }
     }
 }

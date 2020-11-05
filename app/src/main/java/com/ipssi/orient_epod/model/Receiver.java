@@ -18,6 +18,46 @@ public class Receiver implements Parcelable {
         this.location = location;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getMobile() {
+        return phone;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public String getBagsRecv() {
+        return bagsRecv;
+    }
+
+    public String getShortage() {
+        return shortage;
+    }
+
+    public int getLoadType() {
+        return loadType;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public String getSign() {
+        return sign;
+    }
+
+    public int getIsComplete() {
+        return isComplete;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
     private String name;
     private String phone;
     private String invoiceNumber;

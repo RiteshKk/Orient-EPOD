@@ -49,8 +49,8 @@
             android:drawableStart="@drawable/user"
             android:gravity="center"
             android:hint="@string/transporter_code"
-            android:padding="7dp"
             android:inputType="number"
+            android:padding="7dp"
             android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -67,10 +67,10 @@
             android:drawableStart="@drawable/truck"
             android:gravity="center"
             android:hint="@string/truck_number"
+            android:inputType="textCapCharacters"
             android:padding="7dp"
             android:singleLine="true"
             android:textAllCaps="true"
-            android:inputType="textCapCharacters"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/transporter_code" />
@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:background="@drawable/btn_selector"
-            android:enabled="false"
+            android:enabled="@{viewModel.isLoading?false:true}"
             android:paddingHorizontal="100dp"
             android:text="@string/login"
             android:textColor="@android:color/white"
@@ -105,16 +105,17 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorGreyLight"
+            android:background="@color/colorTransparentGreyLight"
             android:clickable="true"
             android:focusable="true"
             android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}">
 
             <ProgressBar
-                style="?android:attr/progressBarStyleLargeInverse"
+                style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:theme="@style/progressBar"
                 tools:visibility="visible" />
         </RelativeLayout>
 

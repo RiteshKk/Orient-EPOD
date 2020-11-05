@@ -7,7 +7,7 @@
     <string name="capture_location">Capture Location</string>
     <string name="location">Location</string>
     <string name="lr_number">LR Number</string>
-    <string name="permission_rationale">Location and Camera permission is needed as core functionality</string>
+    <string name="permission_rationale">Location permission is required as core functionality</string>
     <string name="name">Name</string>
     <string name="mobile">Mobile#</string>
     <string name="bags">Bags#</string>
@@ -24,6 +24,9 @@
     <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul><li>&nbsp;Location to capture appropriate delivery point and delivery visibility to our customer.</li><li>&nbsp;Camera and Storage to facilitate you upload stamped invoice copy.</li></ul>]]></string>
     <string name="driver_portal">Driver Portal</string>
     <string name="transporter_code">Transporter Code</string>
+    <string name="receiver_1">Receiver#1</string>
+    <string name="receiver_2">Receiver#2</string>
+    <string name="receiver_3">Receiver#3</string>
     <string name="truck_number">Truck Number</string>
     <string name="login">Login</string>
     <string name="our_vision">Our Vision : \"Build Sustainably\"</string>
@@ -33,9 +36,6 @@
     <string name="download">Download</string>
     <string name="invoices_for_epod">Invoices for EPOD</string>
     <string name="logout">Logout</string>
-    <string name="title_activity_tabbed">TabbedActivity</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
     <string name="bags_received">Bags Received</string>
     <string name="remarks">Remarks (If Any)</string>
     <string name="bags_damage">Shortage/Damage (Bags/Qty)</string>
@@ -50,4 +50,17 @@
         <item>Bags</item>
         <item>MT</item>
     </string-array>
+
+    <string name="uploading_image">Uploading...</string>
+    <string name="uploaded">Uploaded.</string>
+    <string name="max_3_allowed">Max 3 Images are allowed</string>
+    <string name="field_cant_be_empty">Field can\'t be empty</string>
+    <string name="enter_valid_number">\"Please enter valid mobile number\"</string>
+    <string name="no_records_found">No records found</string>
+    <string name="sure_to_complete">Are you sure to complete the Trip?</string>
+    <string name="allow">Allow</string>
+    <string name="storage_required">Storage permission required to store captured image</string>
+    <string name="provide_signature">Please provide Signature</string>
+    <string name="enter_shortage">Please enter shortage/damages(fill 0 if no shortage/damage)</string>
+
 </resources>

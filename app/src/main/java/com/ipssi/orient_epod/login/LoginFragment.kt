@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +13,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.ipssi.orient_epod.R
 import com.ipssi.orient_epod.callbacks.OnLoginListener
 import com.ipssi.orient_epod.databinding.FragmentLoginBinding
+import com.ipssi.orient_epod.hideKeyboard
 import com.ipssi.orient_epod.model.Credentials
 import com.ipssi.orient_epod.remote.remote.util.Status
 import com.ipssi.orient_epod.remote.util.AppConstant
-import java.lang.Exception
+import com.ipssi.orient_epod.showAlertDialog
 
 class LoginFragment : Fragment() {
 
@@ -43,15 +43,14 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = this
         viewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        binding.viewModel = viewModel
 
         observeModel()
 
         binding.transporterCode.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (s.isNotEmpty() && binding.truckNumber.text != null && binding.truckNumber.text.isNotEmpty()) {
-                    binding.btnLogin.isEnabled = true
-                }
+                binding.transporterCode.error = null
             }
 
             override fun afterTextChanged(s: Editable) {}
@@ -59,18 +58,25 @@ class LoginFragment : Fragment() {
         binding.truckNumber.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (s.isNotEmpty() && binding.transporterCode.text != null && binding.transporterCode.text.isNotEmpty()) {
-                    binding.btnLogin.isEnabled = true
-                }
+                binding.truckNumber.error = null
             }
 
             override fun afterTextChanged(s: Editable) {}
         })
         binding.btnLogin.setOnClickListener {
+            hideKeyboard(binding.root, requireContext())
             val tCode = binding.transporterCode.text.toString()
             val vehicleName = binding.truckNumber.text.toString()
 
-            viewModel.getShipmentDetails(Credentials(transporterCode = tCode, vehicleNo = vehicleName))
+            if (tCode.isNullOrBlank()) {
+                binding.transporterCode.error = getString(R.string.field_cant_be_empty)
+            } else if (vehicleName.isNullOrBlank()) {
+                binding.truckNumber.error = getString(R.string.field_cant_be_empty)
+            }
+
+            if (tCode.isNotEmpty() && vehicleName.isNotEmpty()) {
+                viewModel.getShipmentDetails(Credentials(transporterCode = tCode, vehicleNo = vehicleName))
+            }
         }
     }
 
@@ -80,12 +86,16 @@ class LoginFragment : Fragment() {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         resource.data.let {
-                            requireActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).edit()
-                                .putString(AppConstant.TRANSPORTER_CODE, binding.transporterCode.text.toString())
-                                .putString(AppConstant.VEHICLE_NUMBER, binding.truckNumber.text.toString())
-                                .putBoolean(AppConstant.IS_LOGIN, true)
-                                .apply()
-                            loginListener.onLoginSuccess()
+                            if (resource.data?.invoices?.size ?: 0 > 0) {
+                                requireActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).edit()
+                                    .putString(AppConstant.TRANSPORTER_CODE, binding.transporterCode.text.toString())
+                                    .putString(AppConstant.VEHICLE_NUMBER, binding.truckNumber.text.toString())
+                                    .putBoolean(AppConstant.IS_LOGIN, true)
+                                    .apply()
+                                loginListener.onLoginSuccess()
+                            } else {
+                                Snackbar.make(binding.root, getString(R.string.no_records_found), Snackbar.LENGTH_LONG).show()
+                            }
                         }
                         viewModel.isLoading.value = false
                     }
@@ -94,13 +104,11 @@ class LoginFragment : Fragment() {
                     }
                     Status.ERROR -> {
                         viewModel.isLoading.value = false
-                        Snackbar.make(binding.root, AppConstant.SERVER_ERROR, Snackbar.LENGTH_LONG)
-                            .show()
+                        showAlertDialog(requireActivity(), resource.message)
                     }
                     Status.OFFLINE -> {
                         viewModel.isLoading.value = false
-                        Snackbar.make(binding.root, AppConstant.OFFLINE_ERROR, Snackbar.LENGTH_LONG)
-                            .show()
+                        showAlertDialog(requireActivity(), resource.message)
                     }
                 }
             }

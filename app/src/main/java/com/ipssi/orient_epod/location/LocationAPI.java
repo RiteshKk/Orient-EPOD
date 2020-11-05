@@ -3,6 +3,7 @@ package com.ipssi.orient_epod.location;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
@@ -26,23 +27,21 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.lang.ref.WeakReference;
 
 /**
- * Created by ritesh on 12/8/21.
+ * Created by ritesh on 1/11/2020.
  */
 
 public class LocationAPI {
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     public static final String TAG = "LocationApi";
     private static final int REQUEST_CHECK_SETTINGS = 101;
 
     public final ProgressDialog dialog;
-    private final SettingsClient mSettingsClient;
-    private LocationSettingsRequest mLocationSettingsRequest;
     private LocationRequest mLocationRequest;
     private WeakReference<Activity> contextHolder;
     private OnLocationChangeCallBack listener;
@@ -59,17 +58,15 @@ public class LocationAPI {
      */
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS ;
-    private LocationCallback mLocationCallBack;
 
 
     public LocationAPI(Activity context, OnLocationChangeCallBack listener) {
-        contextHolder = new WeakReference<Activity>(context);
+        contextHolder = new WeakReference<>(context);
         this.listener = listener;
         dialog = new ProgressDialog(contextHolder.get());
         dialog.setMessage("Getting Location Updates\nPlease Wait...");
         dialog.setCancelable(false);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-        mSettingsClient = LocationServices.getSettingsClient(context);
         createLocationCallback();
         createLocationRequest();
 
@@ -77,27 +74,13 @@ public class LocationAPI {
 
 
     private void stopLocationUpdates() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback)
-                .addOnCompleteListener(contextHolder.get(), new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                    }
-                });
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback).addOnSuccessListener(aVoid -> Log.d("locationUpdate","removed successfully"));
     }
 
     public void onStart() {
         buildLocationSettingsRequest();
         dialog.show();
         startLocationUpdates();
-    }
-
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-                              View.OnClickListener listener) {
-        Snackbar.make(
-                contextHolder.get().findViewById(android.R.id.content),
-                contextHolder.get().getString(mainTextStringId),
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(contextHolder.get().getString(actionStringId), listener).show();
     }
 
     private void createLocationRequest() {
@@ -155,7 +138,7 @@ public class LocationAPI {
             }
         });
 
-        task.addOnFailureListener(contextHolder.get(), e -> {
+        task.addOnFailureListener(e -> {
             int statusCode = ((ApiException) e).getStatusCode();
             switch (statusCode) {
                 case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
@@ -181,34 +164,8 @@ public class LocationAPI {
                             "fixed here. Fix in Settings.";
                     Log.e(TAG, errorMessage);
                     Toast.makeText(contextHolder.get(), errorMessage, Toast.LENGTH_LONG).show();
-//                                mRequestingLocationUpdates = false;
             }
         });
-    }
-
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        // All required changes were successfully made
-                        //  startLocationUpdate will call automatically from onResume
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        if(dialog!=null && dialog.isShowing()){
-                            dialog.dismiss();
-                        }
-                        Log.d("result cancel","cancel Location updates");
-                        // The user was asked to change settings, but chose not to
-                        // cancel Location updates
-//                        mRequestingLocationUpdates = false;
-                        break;
-                    default:
-                        break;
-                }
-                break;
-        }
     }
 
 
