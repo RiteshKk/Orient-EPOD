@@ -15,10 +15,7 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.downloader.Error
@@ -26,6 +23,8 @@ import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.google.android.material.snackbar.Snackbar
 import com.ipssi.orient_epod.databinding.FragmentWebViewBinding
+import com.ipssi.orient_epod.remote.util.AppConstant
+import kotlinx.android.synthetic.main.fragment_web_view.*
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
@@ -47,20 +46,29 @@ class WebViewFragment : Fragment() {
     inner class PDFWebViewClient : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
             view?.loadUrl(url)
-            return true
+            return false
         }
+
+        override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
+            super.onReceivedError(view, errorCode, description, failingUrl)
+            Snackbar.make(lr_view_layout, description
+                ?: AppConstant.GENERIC_ERROR, Snackbar.LENGTH_SHORT).show()
+        }
+
     }
 
-    inner class PDFChromeClient : WebChromeClient(){
+    inner class PDFChromeClient : WebChromeClient() {
 
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
             super.onProgressChanged(view, newProgress)
             binding.progressView.visibility = View.VISIBLE
             binding.progressView.progress = newProgress
-            if(newProgress == 100){
+            if (newProgress == 100) {
                 binding.progressView.visibility = View.GONE
             }
         }
+
+
     }
 
 

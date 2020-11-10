@@ -9,7 +9,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 
-class LocationUtils(private val context: Context) {
+class LocationUtils(private val context: Activity) {
     fun turnLocationOn(turnLocationListener: TurnLocationListener) {
         val locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
@@ -21,7 +21,7 @@ class LocationUtils(private val context: Context) {
         val task =
             client.checkLocationSettings(mLocationSettingsRequest)
         task.addOnSuccessListener(
-            (context as Activity)
+            (context)
         ) {
             turnLocationListener.locationStatus(true)
         }

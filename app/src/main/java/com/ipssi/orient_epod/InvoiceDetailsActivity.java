@@ -12,8 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.downloader.core.Core;
 import com.google.android.material.appbar.AppBarLayout;
 import com.ipssi.orient_epod.databinding.ActivityInvoiceDetailsBinding;
+import com.ipssi.orient_epod.location.CoreUtility;
 import com.ipssi.orient_epod.model.Invoice;
 import com.ipssi.orient_epod.model.Receiver;
 import com.ipssi.orient_epod.remote.util.AppConstant;
@@ -22,11 +24,20 @@ import com.ipssi.orient_epod.ui.main.SectionsPagerAdapter;
 
 import java.util.ArrayList;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static com.ipssi.orient_epod.UtilKt.showAlertDialog;
 
 public class InvoiceDetailsActivity extends AppCompatActivity {
     private ActivityInvoiceDetailsBinding binding;
     private InvoiceDetailsViewModel viewModel;
+
+    public static int totalDamage = 0;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        totalDamage = 0;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +84,9 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
                     ArrayList<Receiver> data = receivers.getData();
                     Invoice model = (Invoice) getIntent().getParcelableExtra(AppConstant.MODEL);
                     ArrayList<PlaceholderFragment> fragments = new ArrayList<>();
+                    for (Receiver receiverModel : data) {
+                        totalDamage += Integer.parseInt(receiverModel.getShortage());
+                    }
                     fragments.add(PlaceholderFragment.newInstance(model, data.size() > 0 ? data.get(0) : null));
                     fragments.add(PlaceholderFragment.newInstance(model, data.size() > 1 ? data.get(1) : null));
                     fragments.add(PlaceholderFragment.newInstance(model, data.size() > 2 ? data.get(2) : null));
@@ -110,6 +124,10 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
             startActivity(intent);
         } else if (item.getItemId() == android.R.id.home) {
             finish();
+        } else if (item.getItemId() == R.id.menu_change_language) {
+            Intent intent = new Intent(this, LanguageSelectorActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }

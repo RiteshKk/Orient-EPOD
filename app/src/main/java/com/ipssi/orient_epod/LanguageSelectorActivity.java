@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
@@ -16,6 +17,7 @@ import com.ipssi.orient_epod.adapter.LanguageSelectorAdapter;
 import com.ipssi.orient_epod.callbacks.OnLanguageSelectedListener;
 import com.ipssi.orient_epod.login.LoginFragment;
 import com.ipssi.orient_epod.model.LanguageDetail;
+import com.ipssi.orient_epod.remote.util.AppConstant;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -23,25 +25,25 @@ import java.util.Locale;
 public class LanguageSelectorActivity extends AppCompatActivity implements OnLanguageSelectedListener {
 
 
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_language_selector);
-
-        showPermissionDialog();
+        preferences = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
+        if (preferences.getBoolean(AppConstant.IS_FIRST_LAUNCH, true)) {
+            showPermissionDialog();
+        }
         RecyclerView recyclerView = findViewById(R.id.language_list);
-        findViewById(R.id.btn_get_started).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE).edit().putBoolean("isFirstLaunch", false).apply();
-                Intent intent = new Intent(LanguageSelectorActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
+        findViewById(R.id.btn_get_started).setOnClickListener(v -> {
+            preferences.edit().putBoolean(AppConstant.IS_FIRST_LAUNCH, false).apply();
+            Intent intent = new Intent(LanguageSelectorActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
         });
         ArrayList<LanguageDetail> languageList = createLanguageList();
-        String selectedLang = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE).getString("SELECTED_LANG", null);
+        String selectedLang = preferences.getString(AppConstant.SELECTED_LANGUAGE, "English");
         recyclerView.setAdapter(new LanguageSelectorAdapter(this, languageList, selectedLang));
     }
 
@@ -71,26 +73,16 @@ public class LanguageSelectorActivity extends AppCompatActivity implements OnLan
     @Override
     public void onLanguageSelected(LanguageDetail details) {
         Log.d("selected language", details.getLangEnglishName());
-        getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE).edit().putString("SELECTED_LANG", details.getLangName()).apply();
+        preferences.edit().putString(AppConstant.SELECTED_LANGUAGE, details.getLangName()).apply();
         setLocale(details.getLangCode());
     }
 
-    public void showPermissionDialog(){
+    public void showPermissionDialog() {
         new AlertDialog.Builder(this)
             .setTitle(R.string.required_permission_title)
             .setMessage(Html.fromHtml(getString(R.string.required_permission_message)))
             .setCancelable(true)
-            .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            })
-            .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            }).show();
+            .setPositiveButton(R.string.accept, (dialog, which) -> dialog.dismiss())
+            .setNegativeButton(R.string.close, (dialog, which) -> dialog.dismiss()).show();
     }
 }

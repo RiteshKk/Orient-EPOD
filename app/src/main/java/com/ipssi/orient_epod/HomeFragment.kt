@@ -1,5 +1,6 @@
 package com.ipssi.orient_epod
 
+import android.app.Activity.RESULT_OK
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -15,6 +16,7 @@ import com.ipssi.orient_epod.callbacks.OnInvoiceSelectedListener
 import com.ipssi.orient_epod.databinding.FragmentMainBinding
 import com.ipssi.orient_epod.location.CoreUtility
 import com.ipssi.orient_epod.location.LocationUtils
+import com.ipssi.orient_epod.location.LocationUtils.Companion.LOCATION_REQUEST
 import com.ipssi.orient_epod.login.SharedViewModel
 import com.ipssi.orient_epod.model.Credentials
 import com.ipssi.orient_epod.model.Invoice
@@ -51,28 +53,35 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
         getUpdatedData()
         handleBackPress()
         // for Continuous Location update
-        /*if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
+        if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
             if (CoreUtility.isLocationOn(requireContext())) {
                 configureService(requireContext())
                 CoreUtility.startBackgroundWorker()
             } else {
-                CoreUtility.enableLocation(requireContext(), this)
+                CoreUtility.enableLocation(requireActivity(), this)
             }
         } else {
-            CoreUtility.requestPermissions(requireActivity(), 2001)
-        }*/
+            CoreUtility.requestPermissions(this, 2001)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == LOCATION_REQUEST && resultCode == RESULT_OK) {
+            locationStatus(true)
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 2001 && grantResults[0] == PERMISSION_GRANTED) {
+        if (requestCode == 2001 && grantResults[0] == PERMISSION_GRANTED && grantResults[1] == PERMISSION_GRANTED) {
             if (CoreUtility.isLocationOn(requireContext())) {
                 configureService(requireContext())
                 CoreUtility.startBackgroundWorker()
             } else {
-                CoreUtility.enableLocation(requireContext(), this)
+                CoreUtility.enableLocation(requireActivity(), this)
             }
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun getUpdatedData() {

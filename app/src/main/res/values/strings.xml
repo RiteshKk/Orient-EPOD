@@ -62,5 +62,8 @@
     <string name="storage_required">Storage permission required to store captured image</string>
     <string name="provide_signature">Please provide Signature</string>
     <string name="enter_shortage">Please enter shortage/damages(fill 0 if no shortage/damage)</string>
+    <string name="save_receiver">Save Receiver</string>
+    <string name="complete_trip">Complete Trip</string>
+    <string name="want_to_complete_trip">I want to complete this trip.</string>
 
 </resources>

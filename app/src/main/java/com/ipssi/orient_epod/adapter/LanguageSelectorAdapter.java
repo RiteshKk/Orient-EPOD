@@ -43,10 +43,8 @@ public class LanguageSelectorAdapter extends RecyclerView.Adapter<LanguageSelect
             sb.append(" (");
             sb.append(language.getLangEnglishName());
             sb.append(")");
-        }else if(preSelectedButton == null){
-            holder.selectedLangRadioButton.setChecked(true);
-            preSelectedButton = holder.selectedLangRadioButton;
         }
+
         holder.languageText.setText(sb);
         if (language.getLangName().equalsIgnoreCase(preSelectedLanguage)) {
             holder.selectedLangRadioButton.setChecked(true);
@@ -69,19 +67,16 @@ public class LanguageSelectorAdapter extends RecyclerView.Adapter<LanguageSelect
             languageText = itemView.findViewById(R.id.language_text);
             selectedLangRadioButton = itemView.findViewById(R.id.radio_button);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (preSelectedButton != null) {
-                        if (preSelectedButton == selectedLangRadioButton) {
-                            return;
-                        }
-                        preSelectedButton.setChecked(false);
+            itemView.setOnClickListener(v -> {
+                if (preSelectedButton != null) {
+                    if (preSelectedButton == selectedLangRadioButton) {
+                        return;
                     }
-                    selectedLangRadioButton.setChecked(true);
-                    preSelectedButton = selectedLangRadioButton;
-                    languageSelectorListener.onLanguageSelected(languageList.get(getAdapterPosition()));
+                    preSelectedButton.setChecked(false);
                 }
+                selectedLangRadioButton.setChecked(true);
+                preSelectedButton = selectedLangRadioButton;
+                languageSelectorListener.onLanguageSelected(languageList.get(getAdapterPosition()));
             });
         }
     }

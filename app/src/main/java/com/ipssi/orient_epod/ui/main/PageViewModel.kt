@@ -23,6 +23,7 @@ import java.io.IOException
 class PageViewModel : ViewModel() {
 
     var isEditable = MutableLiveData<Boolean>().apply { value = true }
+    var isCompleteTripChecked = MutableLiveData<Boolean>().apply { value = false }
     var isLoading = MutableLiveData<Boolean>().apply { value = false }
     var saveReceiverResponse = MutableLiveData<Resource<SaveReceiverResponse>>()
     var name = MutableLiveData<String>().apply { value = "" }

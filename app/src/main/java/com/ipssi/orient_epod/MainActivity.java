@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -60,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements OnLoginListener {
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+        }else if(item.getItemId() == R.id.menu_change_language){
+            Intent intent = new Intent(this, LanguageSelectorActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -68,5 +73,12 @@ public class MainActivity extends AppCompatActivity implements OnLoginListener {
     public void onLoginSuccess() {
         getSupportActionBar().show();
         replaceFragment(HomeFragment.class.getName(), "home");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("home");
+        fragment.onActivityResult(requestCode, resultCode, data);
     }
 }

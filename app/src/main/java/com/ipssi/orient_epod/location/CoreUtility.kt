@@ -2,20 +2,18 @@ package com.ipssi.orient_epod.location
 
 import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.ipssi.orient_epod.OrientApp
 import com.ipssi.orient_epod.remote.util.AppConstant
 import com.ipssi.orient_epod.service.BackgroundWorker
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -24,19 +22,13 @@ import java.util.concurrent.TimeUnit
 class CoreUtility {
 
     companion object {
-        fun getCurrentEpochTimeInSec(): Int {
-            val dateObj = Date()
-            return (dateObj.time / 1000).toInt()
-        }
 
         fun requestPermissions(
-            context: Activity,
+            context: Fragment,
             permissionRequestCode: Int
         ) {
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ActivityCompat.requestPermissions(
-                    context,
+                context.requestPermissions(
                     arrayOf(
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_BACKGROUND_LOCATION
@@ -44,10 +36,8 @@ class CoreUtility {
                     permissionRequestCode
                 )
             } else {
-                ActivityCompat.requestPermissions(
-                    context,
+                context.requestPermissions(
                     arrayOf(
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION
                     ),
                     permissionRequestCode
@@ -55,7 +45,7 @@ class CoreUtility {
             }
         }
 
-        fun enableLocation(context: Context, locationOn: LocationUtils.TurnLocationListener) {
+        fun enableLocation(context: Activity, locationOn: LocationUtils.TurnLocationListener) {
             LocationUtils(context).turnLocationOn(locationOn)
         }
 
@@ -89,15 +79,11 @@ class CoreUtility {
          * @param context
          * @return true if permission granted false otherwise*/
         fun isLocationPermissionAvailable(context: Context): Boolean {
-            val permission3 =
-                ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
+
             val permission4 =
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
 
-            return (permission3 == PackageManager.PERMISSION_GRANTED || permission4 == PackageManager.PERMISSION_GRANTED)
+            return (permission4 == PackageManager.PERMISSION_GRANTED)
         }
 
 
@@ -110,7 +96,7 @@ class CoreUtility {
             val workManager = WorkManager.getInstance(OrientApp.instance)
             val workRequest = PeriodicWorkRequest.Builder(
                 BackgroundWorker::class.java,
-                16,
+                1,
                 TimeUnit.MINUTES
             ).build()
             workManager.enqueueUniquePeriodicWork(

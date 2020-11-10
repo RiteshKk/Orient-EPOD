@@ -16,6 +16,7 @@ import com.ipssi.orient_epod.R
 import com.ipssi.orient_epod.location.CoreUtility.Companion.getNotificationChannel
 import com.ipssi.orient_epod.location.CoreUtility.Companion.isLocationOn
 import com.ipssi.orient_epod.location.LocationAPI
+import com.ipssi.orient_epod.location.RetrieveLocationService
 import com.ipssi.orient_epod.remote.util.AppConstant
 import java.util.*
 
@@ -24,7 +25,7 @@ import java.util.*
  * @author Ritesh Kumar
  */
 class LocationScanningService : Service() {
-    private var retrieveLocationService: LocationAPI? = null
+    private var retrieveLocationService: RetrieveLocationService? = null
     private val mData: MutableList<String> =
         ArrayList()
     private var searchTimestamp: Long = 0
@@ -109,8 +110,8 @@ class LocationScanningService : Service() {
     }
 
     private fun startLocationUpdate() {
-        /* retrieveLocationService = LocationAPI(applicationContext,null)
-         retrieveLocationService!!.onStart()*/
+        retrieveLocationService = RetrieveLocationService()
+        retrieveLocationService?.startService()
     }
 
     override fun onBind(intent: Intent): Binder? = null
@@ -123,7 +124,7 @@ class LocationScanningService : Service() {
             mLocationChangeListener?.let { unregisterReceiver(it) }
             stopForeground(true)
             if (retrieveLocationService != null) {
-//                retrieveLocationService!!.stopService()
+                retrieveLocationService!!.stopService()
             }
 
             if (timer != null) {
@@ -147,13 +148,13 @@ class LocationScanningService : Service() {
                 intent: Intent
             ) {
                 val action = intent.action
-                val notification: Notification
                 if (LocationManager.PROVIDERS_CHANGED_ACTION == action) {
-                    if (!isLocationOn(OrientApp.instance.applicationContext)) {
-                        notification =
-                            getNotification(AppConstant.PLEASE_ALLOW_LOCATION)
-                        updateNotification(notification)
+                   val notification = if (!isLocationOn(OrientApp.instance.applicationContext)) {
+                        getNotification(AppConstant.PLEASE_ALLOW_LOCATION)
+                    } else {
+                        getNotification(AppConstant.NOTIFICATION_DESC)
                     }
+                    updateNotification(notification)
                 }
             }
         }
@@ -173,7 +174,7 @@ class LocationScanningService : Service() {
 
 
     companion object {
-        private const val NOTIF_ID = 1973
+        private const val NOTIF_ID = 1989
         var serviceRunning = false
     }
 }

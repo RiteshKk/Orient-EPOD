@@ -3,7 +3,8 @@
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.ipssi.orient_epod.ui.main.PageViewModel" />
@@ -39,8 +40,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clickable="@{viewModel.isEditable}"
-                        android:focusableInTouchMode="@{viewModel.isEditable}"
                         android:focusable="@{viewModel.isEditable}"
+                        android:focusableInTouchMode="@{viewModel.isEditable}"
                         android:singleLine="true"
                         android:text="@={viewModel.name}" />
 
@@ -58,12 +59,12 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:maxLength="10"
                         android:clickable="@{viewModel.isEditable}"
                         android:focusableInTouchMode="@{viewModel.isEditable}"
-                        android:text="@={viewModel.mobile}"
-                        android:singleLine="true" />
+                        android:inputType="number"
+                        android:maxLength="10"
+                        android:singleLine="true"
+                        android:text="@={viewModel.mobile}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -78,11 +79,11 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
                         android:clickable="@{viewModel.isEditable}"
                         android:focusableInTouchMode="@{viewModel.isEditable}"
-                        android:text="@={viewModel.bagsReceived}"
-                        android:singleLine="true" />
+                        android:inputType="number"
+                        android:singleLine="true"
+                        android:text="@={viewModel.bagsReceived}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -103,11 +104,11 @@
                         <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number"
                             android:clickable="@{viewModel.isEditable}"
                             android:focusableInTouchMode="@{viewModel.isEditable}"
-                            android:text="@={viewModel.damageBags}"
-                            android:singleLine="true" />
+                            android:inputType="number"
+                            android:singleLine="true"
+                            android:text="@={viewModel.damageBags}" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <androidx.appcompat.widget.AppCompatSpinner
@@ -129,10 +130,10 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
-                        android:text="@={viewModel.remarks}"
+                        android:layout_height="wrap_content"
                         android:clickable="@{viewModel.isEditable}"
                         android:focusableInTouchMode="@{viewModel.isEditable}"
-                        android:layout_height="wrap_content" />
+                        android:text="@={viewModel.remarks}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -148,68 +149,72 @@
                 <ImageView
                     android:id="@+id/sign"
                     android:layout_width="match_parent"
-                    android:clickable="@{viewModel.isEditable}"
-                    android:focusableInTouchMode="@{viewModel.isEditable}"
                     android:layout_height="100dp"
                     android:background="@color/colorTransparentGreyLight"
+                    android:clickable="@{viewModel.isEditable}"
+                    android:focusable="@{viewModel.isEditable}"
+                    android:focusableInTouchMode="@{viewModel.isEditable}"
                     android:scaleType="centerInside" />
 
-                <LinearLayout
+
+                <CheckBox
+                    android:id="@+id/chech_box_complete_trip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="@={viewModel.isCompleteTripChecked}"
+                    android:text="@string/want_to_complete_trip" />
+
+
+                <TextView
+                    android:id="@+id/btn_submit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:layout_marginEnd="2dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorGreen"
+                    android:gravity="center"
+                    android:paddingVertical="10dp"
+                    android:text="@{viewModel.isCompleteTripChecked ? @string/complete_trip : @string/save_receiver}"
+                    android:textColor="@android:color/white" />
 
-                    <TextView
-                        android:id="@+id/btn_submit"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="2dp"
-                        android:layout_weight="1"
-                        android:background="@color/colorGreen"
-                        android:gravity="center"
-                        android:paddingVertical="10dp"
-                        android:text="@string/submit"
-                        android:textColor="@android:color/white" />
 
-                    <TextView
-                        android:id="@+id/btn_submit_epod"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="2dp"
-                        android:layout_weight="1"
-                        android:background="@color/colorGreen"
-                        android:gravity="center"
-                        android:paddingVertical="10dp"
-                        android:text="@string/submit_epod"
-                        android:textColor="@android:color/white" />
-                </LinearLayout>
+                <View
+                    android:id="@+id/line0"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="30dp"
+                    android:background="@color/colorGreyDark"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_submit" />
+
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp">
 
-                    <TextView
-                        android:id="@+id/damage_bags_heading"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/total_damage"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/rectangle_grey"
-                        android:padding="5dp"
-                        android:text="@string/total_shortage"
-                        android:textSize="@dimen/sp_14"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <View
-                        android:id="@+id/line"
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:background="@color/colorGreyDark"
-                        app:layout_constraintBottom_toBottomOf="@+id/damage_bags_heading"
+                        android:layout_marginTop="@dimen/dp_10"
+                        android:hint="@string/total_shortage"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/damage_bags_heading"
-                        app:layout_constraintTop_toTopOf="@+id/damage_bags_heading" />
+                        app:layout_constraintStart_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:inputType="number"
+                            android:singleLine="true" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/scan_doc_label"
@@ -219,7 +224,7 @@
                         android:text="@string/scan_doc"
                         android:textSize="14sp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/damage_bags_heading" />
+                        app:layout_constraintTop_toBottomOf="@id/total_damage" />
 
                     <TextView
                         android:id="@+id/btn_capture_image"
@@ -245,7 +250,6 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/btn_capture_image" />
 
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
@@ -262,8 +266,8 @@
                 style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:theme="@style/progressBar"
                 android:layout_centerInParent="true"
+                android:theme="@style/progressBar"
                 tools:visibility="visible" />
         </RelativeLayout>
 

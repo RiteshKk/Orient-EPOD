@@ -31,6 +31,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.ipssi.orient_epod.InvoiceDetailsActivity;
 import com.ipssi.orient_epod.R;
 import com.ipssi.orient_epod.adapter.ImageAdapter;
 import com.ipssi.orient_epod.callbacks.OnImageDeleteClickListener;
@@ -112,6 +113,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
     private void init() {
         Receiver receiver = Objects.requireNonNull(getArguments()).getParcelable(AppConstant.RECEIVER);
+        binding.totalDamage.getEditText().setText(String.valueOf(InvoiceDetailsActivity.totalDamage));
         if (receiver != null) {
             viewModel.getName().setValue(receiver.getName());
             viewModel.getMobile().setValue(receiver.getMobile());
@@ -130,7 +132,6 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         viewModel.isEditable().observe(getViewLifecycleOwner(), (isEnabled) -> {
             binding.bagsSpinner.setEnabled(isEnabled);
             binding.btnSubmit.setEnabled(isEnabled);
-            binding.btnSubmitEpod.setEnabled(isEnabled);
         });
         viewModel.getSignature().observe(getViewLifecycleOwner(), (bitmap) -> binding.sign.setImageBitmap(bitmap));
         viewModel.getName().observe(getViewLifecycleOwner(), s -> binding.layoutName.setError(null));
@@ -192,10 +193,16 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             switch (saveReceiverResponse.getStatus()) {
                 case SUCCESS:
                     Snackbar.make(binding.getRoot(), saveReceiverResponse.getData().getMessage(), Snackbar.LENGTH_SHORT).show();
+                    try {
+                        InvoiceDetailsActivity.totalDamage += Integer.parseInt(binding.layoutDamageBags.getEditText().getText().toString());
+                    } catch (NumberFormatException e) {
+                    }
                     if (isFinalSubmit) {
                         new Handler().postDelayed(() -> requireActivity().finish(), 2000
                         );
                     }
+                    binding.totalDamage.getEditText().setText(String.valueOf(InvoiceDetailsActivity.totalDamage));
+                    viewModel.isEditable().setValue(false);
                     viewModel.isLoading().setValue(false);
                     break;
                 case ERROR:
@@ -217,10 +224,11 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             dialogFragment.show(getChildFragmentManager(), "signature");
         });
 
-        binding.btnSubmit.setOnClickListener(v -> onSubmitClick());
-
-        binding.btnSubmitEpod.setOnClickListener(v -> {
-            showCompleteTripAlertDialog();
+        binding.btnSubmit.setOnClickListener(v -> {
+            if (viewModel.isCompleteTripChecked().getValue()) {
+                isFinalSubmit = true;
+            }
+            onSubmitClick();
         });
 
         binding.btnCaptureImage.setOnClickListener(v -> {
