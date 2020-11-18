@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Orient-EPOD</string>
     <string name="customer_name">வாடிக்கையாளர் பெயர்</string>
     <string name="customer_address">வாடிக்கையாளர் முகவரி</string>
     <string name="destination">இலக்கு</string>
@@ -43,6 +44,19 @@
     <string name="uploaded">பதிவேற்றப்பட்டது.</string>
     <string name="max_3_allowed">அதிகபட்சம் 3 படங்கள் அனுமதிக்கப்படுகின்றன</string>
 
+    <string name="field_cant_be_empty">புலம் காலியாக இருக்க முடியாது</string>
+    <string name="enter_valid_number">\"தயவுசெய்து செல்லத்தக்க மொபைல் எண்ணை உள்ளிடவும்\"</string>
+    <string name="no_records_found">பதிவேடுகள் எதுவும் இல்லை</string>
+    <string name="sure_to_complete">நீங்கள் நிச்சயமாக பயணம் முடிக்க?</string>
+    <string name="allow">ஒத்துக்கொள்</string>
+    <string name="storage_required">கைப்பற்றப்பட்ட படிமத்தை சேமிக்க தேவையான சேமிப்பக அனுமதி</string>
+    <string name="provide_signature">தயவு செய்து கையொப்பம் அளிக்கவும்</string>
+    <string name="enter_shortage">Please enter shortage/damages(fill 0 if no shortage/damage)</string>
+    <string name="save_receiver">ரிசீவரை சேமி</string>
+    <string name="complete_trip">முழுமையான பயணம்</string>
+    <string name="want_to_complete_trip">நான் இந்த பயணத்தை முடிக்க வேண்டும்.</string>
+    <string name="load_type">Load Type</string>
+    <string name="permission_rationale">Location permission is required as core functionality</string>
     <string name="required_permission_title">Required Permission</string>
     <string name="accept">Accept</string>
     <string name="close">Close</string>

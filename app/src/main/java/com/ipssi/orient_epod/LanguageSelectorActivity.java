@@ -39,6 +39,7 @@ public class LanguageSelectorActivity extends AppCompatActivity implements OnLan
         findViewById(R.id.btn_get_started).setOnClickListener(v -> {
             preferences.edit().putBoolean(AppConstant.IS_FIRST_LAUNCH, false).apply();
             Intent intent = new Intent(LanguageSelectorActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
         });

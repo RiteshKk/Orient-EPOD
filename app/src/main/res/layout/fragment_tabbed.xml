@@ -111,13 +111,23 @@
                             android:text="@={viewModel.damageBags}" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/bags_spinner"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/load_type"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.8"
-                        android:entries="@array/bags_spinner" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dp_10"
+                        android:layout_marginStart="3dp"
+                        android:layout_weight="0.5"
+                        android:hint="@string/load_type">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:singleLine="true" />
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -172,7 +182,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="2dp"
                     android:layout_weight="1"
-                    android:background="@color/colorGreen"
+                    android:background="@drawable/button_background_selector"
                     android:gravity="center"
                     android:paddingVertical="10dp"
                     android:text="@{viewModel.isCompleteTripChecked ? @string/complete_trip : @string/save_receiver}"

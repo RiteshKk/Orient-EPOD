@@ -13,6 +13,7 @@ object AppConstant {
     const val MODEL: String = "model"
     const val TRANSPORTER_CODE = "transporter_code"
     const val VEHICLE_NUMBER = "vehicle_number"
+    const val SHIPMENT_NUMBER = "SHIPMENT_NUMBER"
     const val IS_LOGIN: String = "login"
     const val SERVER_ERROR = "Server Error. Please try again."
     const val OFFLINE_ERROR = "No Internet Connection"

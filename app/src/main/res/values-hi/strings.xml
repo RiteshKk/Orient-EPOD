@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Orient-EPOD</string>
     <string name="choose_language">एक भाषा चुनें</string>
     <string name="customer_name">ग्राहक का नाम</string>
     <string name="customer_address">ग्राहक का पता</string>
     <string name="destination">गंतव्य</string>
     <string name="quantity">मात्रा</string>
     <string name="capture_location">स्थान चिह्नित करें</string>
+    <string name="permission_rationale">Location permission is required as core functionality</string>
     <string name="location">स्थान</string>
     <string name="lr_number">LR संख्या</string>
     <string name="name">नाम</string>
@@ -42,6 +44,19 @@
     <string name="uploading_image">अपलोड हो रहा है...</string>
     <string name="uploaded">अपलोड किए गए.</string>
     <string name="max_3_allowed">अधिकतम 3 चित्र की अनुमति है</string>
+
+    <string name="field_cant_be_empty">फ़ील्ड खाली नहीं हो सकता</string>
+    <string name="enter_valid_number">\"कृपया वैध मोबाइल नंबर दर्ज करें\"</string>
+    <string name="no_records_found">कोई रिकॉर्ड नहीं मिला</string>
+    <string name="sure_to_complete">क्या आप यात्रा को पूरा करने के लिए सुनिश्चित हैं?</string>
+    <string name="allow">अनुमति दे</string>
+    <string name="storage_required">कैप्चर की गई छवि को स्टोर करने के लिए आवश्यक भंडारण अनुमति</string>
+    <string name="provide_signature">कृपया हस्ताक्षर प्रदान करें</string>
+    <string name="enter_shortage">Please enter shortage/damages(fill 0 if no shortage/damage)</string>
+    <string name="save_receiver">रिसीवर सहेजें</string>
+    <string name="complete_trip">पूरी यात्रा</string>
+    <string name="want_to_complete_trip">मैं इस यात्रा को पूरा करना चाहता हूं।</string>
+    <string name="load_type">Load Type</string>
 
     <string name="required_permission_title">आवश्यक अनुमति</string>
     <string name="accept">स्वीकार करें</string>

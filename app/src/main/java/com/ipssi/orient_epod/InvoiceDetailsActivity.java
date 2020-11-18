@@ -50,6 +50,19 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.setLifecycleOwner(this);
         Invoice model = (Invoice) getIntent().getParcelableExtra(AppConstant.MODEL);
+        StringBuilder address = new StringBuilder();
+        if(model.getShiptopartyAddress()!=null || !model.getShiptopartyAddress().isEmpty()){
+            address.append(model.getShiptopartyAddress());
+        }
+        if(model.getShiptopartyAddress1()!=null || !model.getShiptopartyAddress1().isEmpty()){
+            address.append(address.length()>0?"\n":"");
+            address.append(model.getShiptopartyAddress1());
+        }
+        if(model.getShiptopartyAddress2()!=null || !model.getShiptopartyAddress2().isEmpty()){
+            address.append(address.length()>0?"\n":"");
+            address.append(model.getShiptopartyAddress2());
+        }
+        model.setShiptopartyAddress(address.toString());
         binding.setModel(model);
 
         viewModel.getReceivers(model.getInvoiceNumber());
@@ -126,7 +139,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
             finish();
         } else if (item.getItemId() == R.id.menu_change_language) {
             Intent intent = new Intent(this, LanguageSelectorActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

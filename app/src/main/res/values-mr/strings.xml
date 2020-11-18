@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Orient-EPOD</string>
     <string name="customer_name">ग्राहकाचे नाव</string>
     <string name="customer_address">ग्राहक पत्ता</string>
     <string name="destination">गंतव्य</string>
@@ -43,6 +44,19 @@
     <string name="uploaded">अपलोड केले.</string>
     <string name="max_3_allowed">कमाल 3 चित्रांना परवानगी आहे</string>
 
+    <string name="field_cant_be_empty">क्षेत्र रिकामे असू शकत नाही</string>
+    <string name="enter_valid_number">\"कृपया वैध मोबाइल क्रमांक प्रविष्ट करा\"</string>
+    <string name="no_records_found">रेकॉर्ड आढळले नाही</string>
+    <string name="sure_to_complete">तू प्रवास नक्की पूर्ण करणार आहेस का?</string>
+    <string name="allow">परवानगी द्या</string>
+    <string name="storage_required">कॅप्चर केलेली प्रतिमा संचयीत करण्यासाठी आवश्यक साठवण परवानगी</string>
+    <string name="provide_signature">कृपया स्वाक्षरी प्रदान करा</string>
+    <string name="enter_shortage">Please enter shortage/damages(fill 0 if no shortage/damage)</string>
+    <string name="save_receiver">रिसिव्हर संचयीत कराr</string>
+    <string name="complete_trip">संपूर्ण प्रवास</string>
+    <string name="want_to_complete_trip">मला हा प्रवास पूर्ण करायचा आहे.</string>
+    <string name="load_type">Load Type</string>
+    <string name="permission_rationale">Location permission is required as core functionality</string>
     <string name="required_permission_title">Required Permission</string>
     <string name="accept">Accept</string>
     <string name="close">Close</string>

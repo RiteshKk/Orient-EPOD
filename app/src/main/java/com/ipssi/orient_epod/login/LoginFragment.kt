@@ -90,6 +90,7 @@ class LoginFragment : Fragment() {
                                 requireActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).edit()
                                     .putString(AppConstant.TRANSPORTER_CODE, binding.transporterCode.text.toString())
                                     .putString(AppConstant.VEHICLE_NUMBER, binding.truckNumber.text.toString())
+                                        .putString(AppConstant.SHIPMENT_NUMBER, resource.data?.invoices?.get(0)?.shipmentNumber)
                                     .putBoolean(AppConstant.IS_LOGIN, true)
                                     .apply()
                                 loginListener.onLoginSuccess()

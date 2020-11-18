@@ -65,5 +65,6 @@
     <string name="save_receiver">Save Receiver</string>
     <string name="complete_trip">Complete Trip</string>
     <string name="want_to_complete_trip">I want to complete this trip.</string>
+    <string name="load_type">Load Type</string>
 
 </resources>

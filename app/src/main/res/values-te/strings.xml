@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Orient-EPOD</string>
     <string name="customer_name">వినియోగదారుని పేరు</string>
     <string name="customer_address">కస్టమర్ చిరునామా</string>
     <string name="destination">గమ్యం</string>
@@ -43,6 +44,19 @@
     <string name="uploaded">అప్‌లోడ్ చేయబడింది.</string>
     <string name="max_3_allowed">మాక్స్ 3 పిక్చర్స్ అనుమతించబడతాయి</string>
 
+    <string name="field_cant_be_empty">ఫీల్డ్ ఖాళీగా ఉండలేరు</string>
+    <string name="enter_valid_number">\"దయచేసి చెల్లుబాటు అయ్యే మొబైల్ నెంబరు నమోదు చేయండి\"</string>
+    <string name="no_records_found">రికార్డులు ఏవీ కనుగొనబడలేదు</string>
+    <string name="sure_to_complete">మీరు ట్రిప్ని ఖచ్చితంగా పూర్తి చేయాలని అనుకుంటున్నారా?</string>
+    <string name="allow">అనుమతించు</string>
+    <string name="storage_required">క్యాప్చర్ చేయబడ్డ ఇమేజ్ ని స్టోరు చేయడానికి స్టోరేజీ పర్మిషన్ అవసరం అవుతుంది</string>
+    <string name="provide_signature">దయచేసి సంతకం అందించండి</string>
+    <string name="enter_shortage">Please enter shortage/damages(fill 0 if no shortage/damage)</string>
+    <string name="save_receiver">రిసీవర్ భద్రపరుచు</string>
+    <string name="complete_trip">పూర్తి యాత్ర</string>
+    <string name="want_to_complete_trip">నేను ఈ ట్రిప్ ని పూర్తి చేయాలని అనుకుంటున్నాను.</string>
+    <string name="load_type">Load Type</string>
+    <string name="permission_rationale">Location permission is required as core functionality</string>
     <string name="required_permission_title">Required Permission</string>
     <string name="accept">Accept</string>
     <string name="close">Close</string>

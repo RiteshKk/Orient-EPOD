@@ -73,7 +73,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == 2001 && grantResults[0] == PERMISSION_GRANTED && grantResults[1] == PERMISSION_GRANTED) {
+        if (requestCode == 2001 && grantResults[0] == PERMISSION_GRANTED) {
             if (CoreUtility.isLocationOn(requireContext())) {
                 configureService(requireContext())
                 CoreUtility.startBackgroundWorker()

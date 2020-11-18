@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements OnLoginListener {
             startActivity(intent);
         }else if(item.getItemId() == R.id.menu_change_language){
             Intent intent = new Intent(this, LanguageSelectorActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

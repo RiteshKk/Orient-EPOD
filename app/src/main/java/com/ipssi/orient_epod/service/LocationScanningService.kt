@@ -35,6 +35,7 @@ class LocationScanningService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        Log.d("[onCreate]","service started")
         createNotificationChannel()
         val notification =
             getNotification(AppConstant.NOTIFICATION_DESC)

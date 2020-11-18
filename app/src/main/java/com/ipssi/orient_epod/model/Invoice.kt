@@ -29,6 +29,7 @@ class Invoice() : Parcelable {
     var shipmentCreationTime = ""
     var vehicleNo = ""
     var transporterCode = ""
+    var loadType = "standard"
 
     constructor(parcel: Parcel) : this() {
         receivers = parcel.createTypedArrayList(Receiver.CREATOR)!!
@@ -56,6 +57,7 @@ class Invoice() : Parcelable {
         shipmentCreationTime = parcel.readString() ?: ""
         vehicleNo = parcel.readString() ?: ""
         transporterCode = parcel.readString() ?: ""
+        loadType = parcel.readString() ?: "standard"
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -84,6 +86,7 @@ class Invoice() : Parcelable {
         parcel.writeString(shipmentCreationTime)
         parcel.writeString(vehicleNo)
         parcel.writeString(transporterCode)
+        parcel.writeString(loadType)
     }
 
     override fun describeContents(): Int {

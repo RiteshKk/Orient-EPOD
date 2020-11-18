@@ -6,8 +6,10 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
@@ -24,23 +26,23 @@ class CoreUtility {
     companion object {
 
         fun requestPermissions(
-            context: Fragment,
-            permissionRequestCode: Int
+                context: Fragment,
+                permissionRequestCode: Int
         ) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 context.requestPermissions(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                    ),
-                    permissionRequestCode
+                        arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                        ),
+                        permissionRequestCode
                 )
             } else {
                 context.requestPermissions(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ),
-                    permissionRequestCode
+                        arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                        ),
+                        permissionRequestCode
                 )
             }
         }
@@ -56,19 +58,20 @@ class CoreUtility {
         fun isLocationOn(context: Context): Boolean {
 
             val locationManager =
-                context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+                    context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
             var gpsEnabled = false
             var networkEnabled = false
 
             try {
                 gpsEnabled =
-                    locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) ?: false
+                        locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) ?: false
             } catch (e: Exception) {
             }
 
             try {
                 networkEnabled =
-                    locationManager?.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ?: false
+                        locationManager?.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                                ?: false
             } catch (e: Exception) {
             }
 
@@ -81,7 +84,7 @@ class CoreUtility {
         fun isLocationPermissionAvailable(context: Context): Boolean {
 
             val permission4 =
-                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
 
             return (permission4 == PackageManager.PERMISSION_GRANTED)
         }
@@ -93,17 +96,24 @@ class CoreUtility {
 
 
         fun startBackgroundWorker() {
+            Log.d("[startBackgroundWorker]", "starting workmanager")
             val workManager = WorkManager.getInstance(OrientApp.instance)
+            val constraints: Constraints = Constraints.Builder()
+                    .setRequiresBatteryNotLow(true).build()
             val workRequest = PeriodicWorkRequest.Builder(
-                BackgroundWorker::class.java,
-                1,
-                TimeUnit.MINUTES
-            ).build()
-            workManager.enqueueUniquePeriodicWork(
-                BackgroundWorker.UNIQUE_WORK_NAME,
-                ExistingPeriodicWorkPolicy.REPLACE,
-                workRequest
+                    BackgroundWorker::class.java,
+                    20,
+                    TimeUnit.MINUTES
             )
+                    .addTag("periodicWorkRequest")
+                    .setConstraints(constraints)
+                    .build()
+            workManager.enqueue(workRequest)
+            /* workManager.enqueueUniquePeriodicWork(
+                     BackgroundWorker.UNIQUE_WORK_NAME,
+                     ExistingPeriodicWorkPolicy.REPLACE,
+                     workRequest
+             )*/
         }
     }
 }

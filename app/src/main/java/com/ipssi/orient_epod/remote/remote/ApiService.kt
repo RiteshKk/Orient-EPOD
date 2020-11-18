@@ -25,5 +25,7 @@ interface ApiService {
 
     @DELETE(DELETE_UPLOADED_IMAGE)
     suspend fun getUploadedImage(@Path("id")id:Long) : EpodResponse
+    @POST(SAVE_DRIVER_LOCATION)
+    suspend fun saveDriverLocation(@Body driverLocationEntity: DriverLocationEntity): Any
 }
 

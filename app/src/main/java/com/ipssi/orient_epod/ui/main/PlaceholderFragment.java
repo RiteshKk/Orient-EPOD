@@ -64,6 +64,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     private SharedPreferences permissionStatus;
     private PageViewModel viewModel;
     private boolean isFinalSubmit = false;
+    private Invoice invoice;
 
     public static PlaceholderFragment newInstance(Invoice invoice, Receiver receiver) {
         Bundle bundle = new Bundle();
@@ -76,8 +77,8 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
     @Override
     public View onCreateView(
-        @NonNull LayoutInflater inflater, ViewGroup container,
-        Bundle savedInstanceState) {
+            @NonNull LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         binding = FragmentTabbedBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -88,6 +89,9 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         binding.setLifecycleOwner(this);
         permissionStatus = requireContext().getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
 
+        if (getArguments() != null) {
+            invoice = getArguments().getParcelable(AppConstant.INVOICE);
+        }
         viewModel = new ViewModelProvider(this).get(PageViewModel.class);
         binding.setViewModel(viewModel);
         locationApi = new LocationAPI(requireActivity(), this);
@@ -105,21 +109,18 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     }
 
     private void getUploadedDocs() {
-        if (getArguments() != null) {
-            Invoice invoice = getArguments().getParcelable(AppConstant.INVOICE);
-            viewModel.fetchUploadedImage(invoice);
-        }
+        viewModel.fetchUploadedImage(invoice);
     }
 
     private void init() {
         Receiver receiver = Objects.requireNonNull(getArguments()).getParcelable(AppConstant.RECEIVER);
         binding.totalDamage.getEditText().setText(String.valueOf(InvoiceDetailsActivity.totalDamage));
+        binding.loadType.getEditText().setText(invoice.getLoadType().equalsIgnoreCase("Standard") ? "Bags" : "MT");
         if (receiver != null) {
             viewModel.getName().setValue(receiver.getName());
             viewModel.getMobile().setValue(receiver.getMobile());
             viewModel.getBagsReceived().setValue(receiver.getBagsRecv());
             viewModel.getDamageBags().setValue(receiver.getShortage());
-            binding.bagsSpinner.setSelection(receiver.getLoadType());
             viewModel.getRemarks().setValue(receiver.getRemarks());
             byte[] decode = Base64.decode(receiver.getSign(), Base64.DEFAULT);
             Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
@@ -130,8 +131,14 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
     private void setObserver() {
         viewModel.isEditable().observe(getViewLifecycleOwner(), (isEnabled) -> {
-            binding.bagsSpinner.setEnabled(isEnabled);
             binding.btnSubmit.setEnabled(isEnabled);
+        });
+        viewModel.isCompleteTripChecked().observe(getViewLifecycleOwner(),(isChecked) -> {
+            if(isChecked) {
+                binding.btnSubmit.setEnabled(isChecked);
+            }else{
+                binding.btnSubmit.setEnabled(viewModel.isEditable().getValue());
+            }
         });
         viewModel.getSignature().observe(getViewLifecycleOwner(), (bitmap) -> binding.sign.setImageBitmap(bitmap));
         viewModel.getName().observe(getViewLifecycleOwner(), s -> binding.layoutName.setError(null));
@@ -243,14 +250,14 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
     private void showCompleteTripAlertDialog() {
         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setMessage(R.string.sure_to_complete)
-            .setTitle(R.string.submit_epod)
-            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                isFinalSubmit = true;
-                onSubmitClick();
-            })
-            .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
-            .show();
+                .setMessage(R.string.sure_to_complete)
+                .setTitle(R.string.submit_epod)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    isFinalSubmit = true;
+                    onSubmitClick();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
 
     }
 
@@ -262,8 +269,8 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                 if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
                     alert.setMessage(R.string.storage_required)
-                        .setPositiveButton(R.string.allow, (DialogInterface dialogInterface, int i) -> requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2))
-                        .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss()).show();
+                            .setPositiveButton(R.string.allow, (DialogInterface dialogInterface, int i) -> requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2))
+                            .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss()).show();
                 } else if (permissionStatus.getBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, false)) {
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                     Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
@@ -284,7 +291,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     private void checkPermissionAndGetLocation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationApi.onStart();
             } else {
                 requestPermissions();
@@ -341,10 +348,10 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
         if (shouldProvideRationale) {
             showSnackbar(R.string.permission_rationale,
-                android.R.string.ok, v ->
-                    requestPermissions(
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        102));
+                    android.R.string.ok, v ->
+                            requestPermissions(
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    102));
         } else if (permissionStatus.getBoolean(Manifest.permission.ACCESS_FINE_LOCATION, false)) {
             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
@@ -352,8 +359,8 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             startActivityForResult(intent, 102);
         } else {
             requestPermissions(
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                102);
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    102);
         }
 
         SharedPreferences.Editor editor = permissionStatus.edit();
@@ -379,7 +386,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     public void onLocationChange(Location loc) {
         if (getArguments() != null) {
             Invoice invoice = getArguments().getParcelable(AppConstant.INVOICE);
-            viewModel.saveReceiver(invoice.getInvoiceNumber(), binding.bagsSpinner.getSelectedItemPosition(), loc, isFinalSubmit);
+            viewModel.saveReceiver(invoice.getInvoiceNumber(), invoice.getLoadType().equalsIgnoreCase("standard")?0:1,loc, isFinalSubmit);
         }
         locationApi.onStop();
     }
