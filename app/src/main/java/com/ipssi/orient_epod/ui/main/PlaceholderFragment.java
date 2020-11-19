@@ -146,39 +146,41 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         viewModel.getSignature().observe(getViewLifecycleOwner(), (bitmap) -> binding.sign.setImageBitmap(bitmap));
         viewModel.getName().observe(getViewLifecycleOwner(), s -> binding.layoutName.setError(null));
         viewModel.getMobile().observe(getViewLifecycleOwner(), s -> binding.layoutMobile.setError(null));
-        viewModel.getBagsReceived().observe(getViewLifecycleOwner(), s ->{
+        viewModel.getBagsReceived().observe(getViewLifecycleOwner(), s -> {
             hasError = false;
             binding.layoutBags.setError(null);
-            if(s.length()>0) {
-                String damageBagsValue = viewModel.getDamageBags().getValue();
-                if (!damageBagsValue.isEmpty()) {
-                    int damagedBags = Integer.parseInt(damageBagsValue);
-                    int receivedBags = Integer.parseInt(s);
-                    if(damagedBags > receivedBags){
-                        hasError = true;
-                        binding.layoutBags.setError("Damage bags quantity can not exceed Received bags quantity");
+            if (viewModel.isEditable().getValue()) {
+                if (s.length() > 0) {
+                    String damageBagsValue = viewModel.getDamageBags().getValue();
+                    if (!damageBagsValue.isEmpty()) {
+                        int damagedBags = Integer.parseInt(damageBagsValue);
+                        int receivedBags = Integer.parseInt(s);
+                        if (damagedBags > receivedBags) {
+                            hasError = true;
+                            binding.layoutBags.setError("Damage bags quantity can not exceed Received bags quantity");
+                        }
                     }
                 }
-            }
 
-            try {
-                if (InvoiceDetailsActivity.totalQuantity < InvoiceDetailsActivity.inputQuantity + Integer.parseInt(s)) {
-                    hasError = true;
-                    binding.layoutBags.setError("Bags quantity can not exceed total quantity");
+                try {
+                    if (InvoiceDetailsActivity.totalQuantity < InvoiceDetailsActivity.inputQuantity + Integer.parseInt(s)) {
+                        hasError = true;
+                        binding.layoutBags.setError("Bags quantity can not exceed total quantity");
+                    }
+                } catch (Exception e) {
                 }
-            }catch(Exception e){}
-
+            }
 
         });
         viewModel.getDamageBags().observe(getViewLifecycleOwner(), s -> {
             binding.layoutDamageBags.setError(null);
             hasError = false;
-            if(s.length()>0) {
+            if (s.length() > 0) {
                 String receivedBagsValue = viewModel.getBagsReceived().getValue();
                 if (!receivedBagsValue.isEmpty()) {
                     int receivedBags = Integer.parseInt(receivedBagsValue);
                     int damageBags = Integer.parseInt(s);
-                    if(damageBags > receivedBags){
+                    if (damageBags > receivedBags) {
                         hasError = true;
                         binding.layoutDamageBags.setError("Damage bags quantity can not exceed Received bags quantity");
                     }
@@ -365,7 +367,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             binding.layoutBags.setError(getString(R.string.field_cant_be_empty));
             return;
         }
-        if(hasError){
+        if (hasError) {
             return;
         }
 
@@ -430,10 +432,10 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             Invoice invoice = getArguments().getParcelable(AppConstant.INVOICE);
             Receiver receiver = Objects.requireNonNull(getArguments()).getParcelable(AppConstant.RECEIVER);
             int id = -1;
-            if(receiver != null){
+            if (receiver != null) {
                 id = receiver.getId();
             }
-            viewModel.saveReceiver(id,invoice.getInvoiceNumber(), invoice.getLoadType().equalsIgnoreCase("standard") ? 0 : 1, loc, isFinalSubmit);
+            viewModel.saveReceiver(id, invoice.getInvoiceNumber(), invoice.getLoadType().equalsIgnoreCase("standard") ? 0 : 1, loc, isFinalSubmit);
         }
         locationApi.onStop();
     }
