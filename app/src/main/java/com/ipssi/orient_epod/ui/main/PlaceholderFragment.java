@@ -51,6 +51,7 @@ import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
+import static com.ipssi.orient_epod.UtilKt.hideKeyboard;
 import static com.ipssi.orient_epod.UtilKt.showAlertDialog;
 
 /**
@@ -273,6 +274,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
     private void handleClickListener() {
         binding.sign.setOnClickListener(v -> {
+            hideKeyboard(binding.getRoot(),requireContext());
             SignatureDialogFragment dialogFragment = new SignatureDialogFragment(PlaceholderFragment.this);
             dialogFragment.show(getChildFragmentManager(), "signature");
         });
