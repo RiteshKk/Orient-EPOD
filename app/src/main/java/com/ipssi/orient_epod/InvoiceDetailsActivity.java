@@ -3,6 +3,7 @@ package com.ipssi.orient_epod;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,11 +33,15 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
     private InvoiceDetailsViewModel viewModel;
 
     public static int totalDamage = 0;
+    public static int totalQuantity = 0;
+    public static int inputQuantity = 0;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         totalDamage = 0;
+        totalQuantity = 0;
+        inputQuantity = 0;
     }
 
     @Override
@@ -50,6 +55,12 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.setLifecycleOwner(this);
         Invoice model = (Invoice) getIntent().getParcelableExtra(AppConstant.MODEL);
+        try {
+            totalQuantity = 20 * Integer.parseInt(model.getInvoiceQuantity());
+        }catch(Exception e){
+            Log.e("NumberFormatException",e.getMessage());
+            totalQuantity = 0;
+        }
         StringBuilder address = new StringBuilder();
         if (model.getShiptopartyAddress() != null && !model.getShiptopartyAddress().isEmpty()) {
             address.append(model.getShiptopartyAddress());
@@ -101,9 +112,16 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
                         if (i < 3) {
                             Receiver receiverModel = data.get(i);
                             totalDamage += Integer.parseInt(receiverModel.getShortage());
+                            inputQuantity += Integer.parseInt(receiverModel.getBagsRecv());
                         }
                     }
-                    fragments.add(PlaceholderFragment.newInstance(model, (data != null && data.size() > 0) ? data.get(0) : null));
+                    Receiver receiver = null;
+                    if (data == null || data.size() == 0) {
+                        receiver = new Receiver(model.getShiptopartyName(),model.getShiptopartyMobileno(),"","","",model.getLoadType().equalsIgnoreCase("standard")?0:1,"","",1,null);
+                    }else{
+                        receiver = data.get(0);
+                    }
+                    fragments.add(PlaceholderFragment.newInstance(model, receiver));
                     fragments.add(PlaceholderFragment.newInstance(model, (data != null && data.size() > 1) ? data.get(1) : null));
                     fragments.add(PlaceholderFragment.newInstance(model, (data != null && data.size() > 2) ? data.get(2) : null));
                     SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), fragments);

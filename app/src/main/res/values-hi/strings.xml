@@ -46,7 +46,7 @@
     <string name="max_3_allowed">अधिकतम 3 चित्र की अनुमति है</string>
 
     <string name="field_cant_be_empty">फ़ील्ड खाली नहीं हो सकता</string>
-    <string name="enter_valid_number">\"कृपया वैध मोबाइल नंबर दर्ज करें\"</string>
+    <string name="enter_valid_number">कृपया वैध मोबाइल नंबर दर्ज करें</string>
     <string name="no_records_found">कोई रिकॉर्ड नहीं मिला</string>
     <string name="sure_to_complete">क्या आप यात्रा को पूरा करने के लिए सुनिश्चित हैं?</string>
     <string name="allow">अनुमति दे</string>

@@ -38,7 +38,7 @@ class PageViewModel : ViewModel() {
     var imageDeleteObserver = MutableLiveData<Resource<EpodResponse>>()
 
 
-    fun saveReceiver(invoice: String, loadType: Int, location: Location, isFinalSubmit: Boolean) {
+    fun saveReceiver(id:Int,invoice: String, loadType: Int, location: Location, isFinalSubmit: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             saveReceiverResponse.postValue(Resource.loading(null))
             val byteArrayOutputStream = ByteArrayOutputStream()
@@ -47,7 +47,11 @@ class PageViewModel : ViewModel() {
             byteArrayOutputStream.close()
             val encoded = Base64.encodeToString(byteArray, Base64.DEFAULT)
 
-            val receiver = Receiver(name.value, mobile.value, invoice, bagsReceived.value, damageBags.value, loadType, remarks.value, encoded, if (isFinalSubmit) 2 else 1, "${location.latitude},${location.longitude}")
+            val receiver = Receiver(name.value, mobile.value, invoice, bagsReceived.value, damageBags.value
+                    ?: "0", loadType, remarks.value, encoded, if (isFinalSubmit) 2 else 1, "${location.latitude},${location.longitude}")
+            if(id>0){
+                receiver.id = id
+            }
             try {
                 val saveReceiverDetails = ApiHelper(getApiService()).saveReceiverDetails(receiver)
                 saveReceiverResponse.postValue(Resource.success(saveReceiverDetails))
@@ -95,11 +99,11 @@ class PageViewModel : ViewModel() {
 
             try {
                 val uploadedImage = ApiHelper(getApiService()).getUploadedImage(
-                    shipment = invoice?.shipmentNumber ?: "0",
-                    invoice = invoice?.invoiceNumber ?: "0",
-                    doNumber = invoice?.doNumber ?: "0",
-                    lrNumber = invoice?.lrNumber ?: "0",
-                    from = "1"
+                        shipment = invoice?.shipmentNumber ?: "0",
+                        invoice = invoice?.invoiceNumber ?: "0",
+                        doNumber = invoice?.doNumber ?: "0",
+                        lrNumber = invoice?.lrNumber ?: "0",
+                        from = "1"
                 )
                 imageList.postValue(Resource.success(uploadedImage))
             } catch (ex: java.lang.Exception) {

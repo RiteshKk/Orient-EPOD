@@ -45,7 +45,7 @@
     <string name="max_3_allowed">कमाल 3 चित्रांना परवानगी आहे</string>
 
     <string name="field_cant_be_empty">क्षेत्र रिकामे असू शकत नाही</string>
-    <string name="enter_valid_number">\"कृपया वैध मोबाइल क्रमांक प्रविष्ट करा\"</string>
+    <string name="enter_valid_number">कृपया वैध मोबाइल क्रमांक प्रविष्ट करा</string>
     <string name="no_records_found">रेकॉर्ड आढळले नाही</string>
     <string name="sure_to_complete">तू प्रवास नक्की पूर्ण करणार आहेस का?</string>
     <string name="allow">परवानगी द्या</string>

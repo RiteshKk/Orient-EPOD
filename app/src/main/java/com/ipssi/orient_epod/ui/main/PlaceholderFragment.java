@@ -64,6 +64,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     private SharedPreferences permissionStatus;
     private PageViewModel viewModel;
     private boolean isFinalSubmit = false;
+    private boolean hasError = false;
     private Invoice invoice;
 
     public static PlaceholderFragment newInstance(Invoice invoice, Receiver receiver) {
@@ -119,13 +120,15 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         if (receiver != null) {
             viewModel.getName().setValue(receiver.getName());
             viewModel.getMobile().setValue(receiver.getMobile());
-            viewModel.getBagsReceived().setValue(receiver.getBagsRecv());
-            viewModel.getDamageBags().setValue(receiver.getShortage());
-            viewModel.getRemarks().setValue(receiver.getRemarks());
-            byte[] decode = Base64.decode(receiver.getSign(), Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
-            viewModel.getSignature().setValue(bitmap);
-            viewModel.isEditable().setValue(false);
+            if (!receiver.getInvoiceNumber().isEmpty()) {
+                viewModel.getBagsReceived().setValue(receiver.getBagsRecv());
+                viewModel.getDamageBags().setValue(receiver.getShortage());
+                viewModel.getRemarks().setValue(receiver.getRemarks());
+                byte[] decode = Base64.decode(receiver.getSign(), Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
+                viewModel.getSignature().setValue(bitmap);
+                viewModel.isEditable().setValue(false);
+            }
         }
     }
 
@@ -133,18 +136,58 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         viewModel.isEditable().observe(getViewLifecycleOwner(), (isEnabled) -> {
             binding.btnSubmit.setEnabled(isEnabled);
         });
-        viewModel.isCompleteTripChecked().observe(getViewLifecycleOwner(),(isChecked) -> {
-            if(isChecked) {
-                binding.btnSubmit.setEnabled(isChecked);
-            }else{
+        viewModel.isCompleteTripChecked().observe(getViewLifecycleOwner(), (isChecked) -> {
+            if (isChecked) {
+                binding.btnSubmit.setEnabled(true);
+            } else {
                 binding.btnSubmit.setEnabled(viewModel.isEditable().getValue());
             }
         });
         viewModel.getSignature().observe(getViewLifecycleOwner(), (bitmap) -> binding.sign.setImageBitmap(bitmap));
         viewModel.getName().observe(getViewLifecycleOwner(), s -> binding.layoutName.setError(null));
         viewModel.getMobile().observe(getViewLifecycleOwner(), s -> binding.layoutMobile.setError(null));
-        viewModel.getBagsReceived().observe(getViewLifecycleOwner(), s -> binding.layoutBags.setError(null));
-        viewModel.getDamageBags().observe(getViewLifecycleOwner(), s -> binding.layoutDamageBags.setError(null));
+        viewModel.getBagsReceived().observe(getViewLifecycleOwner(), s ->{
+            hasError = false;
+            binding.layoutBags.setError(null);
+            if(s.length()>0) {
+                String damageBagsValue = viewModel.getDamageBags().getValue();
+                if (!damageBagsValue.isEmpty()) {
+                    int damagedBags = Integer.parseInt(damageBagsValue);
+                    int receivedBags = Integer.parseInt(s);
+                    if(damagedBags > receivedBags){
+                        hasError = true;
+                        binding.layoutBags.setError("Damage bags quantity can not exceed Received bags quantity");
+                    }
+                }
+            }
+
+            try {
+                if (InvoiceDetailsActivity.totalQuantity < InvoiceDetailsActivity.inputQuantity + Integer.parseInt(s)) {
+                    hasError = true;
+                    binding.layoutBags.setError("Bags quantity can not exceed total quantity");
+                }
+            }catch(Exception e){}
+
+
+        });
+        viewModel.getDamageBags().observe(getViewLifecycleOwner(), s -> {
+            binding.layoutDamageBags.setError(null);
+            hasError = false;
+            if(s.length()>0) {
+                String receivedBagsValue = viewModel.getBagsReceived().getValue();
+                if (!receivedBagsValue.isEmpty()) {
+                    int receivedBags = Integer.parseInt(receivedBagsValue);
+                    int damageBags = Integer.parseInt(s);
+                    if(damageBags > receivedBags){
+                        hasError = true;
+                        binding.layoutDamageBags.setError("Damage bags quantity can not exceed Received bags quantity");
+                    }
+                } else {
+                    hasError = true;
+                    binding.layoutBags.setError("Enter Received bags quantity");
+                }
+            }
+        });
         viewModel.getUploadStatus().observe(getViewLifecycleOwner(), (imageResponseResource) -> {
             switch (imageResponseResource.getStatus()) {
                 case LOADING:
@@ -202,13 +245,14 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                     Snackbar.make(binding.getRoot(), saveReceiverResponse.getData().getMessage(), Snackbar.LENGTH_SHORT).show();
                     try {
                         InvoiceDetailsActivity.totalDamage += Integer.parseInt(binding.layoutDamageBags.getEditText().getText().toString());
+                        InvoiceDetailsActivity.inputQuantity += Integer.parseInt(binding.layoutBags.getEditText().getText().toString());
                     } catch (NumberFormatException e) {
                     }
                     if (isFinalSubmit) {
                         new Handler().postDelayed(() -> requireActivity().finish(), 2000
                         );
                     }
-                    binding.totalDamage.getEditText().setText(String.valueOf(InvoiceDetailsActivity.totalDamage));
+                    Objects.requireNonNull(binding.totalDamage.getEditText()).setText(String.valueOf(InvoiceDetailsActivity.totalDamage));
                     viewModel.isEditable().setValue(false);
                     viewModel.isLoading().setValue(false);
                     break;
@@ -321,9 +365,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             binding.layoutBags.setError(getString(R.string.field_cant_be_empty));
             return;
         }
-        String shortage = Objects.requireNonNull(binding.layoutDamageBags.getEditText()).getText().toString();
-        if (shortage.isEmpty()) {
-            binding.layoutDamageBags.setError(getString(R.string.enter_shortage));
+        if(hasError){
             return;
         }
 
@@ -386,7 +428,12 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     public void onLocationChange(Location loc) {
         if (getArguments() != null) {
             Invoice invoice = getArguments().getParcelable(AppConstant.INVOICE);
-            viewModel.saveReceiver(invoice.getInvoiceNumber(), invoice.getLoadType().equalsIgnoreCase("standard")?0:1,loc, isFinalSubmit);
+            Receiver receiver = Objects.requireNonNull(getArguments()).getParcelable(AppConstant.RECEIVER);
+            int id = -1;
+            if(receiver != null){
+                id = receiver.getId();
+            }
+            viewModel.saveReceiver(id,invoice.getInvoiceNumber(), invoice.getLoadType().equalsIgnoreCase("standard") ? 0 : 1, loc, isFinalSubmit);
         }
         locationApi.onStop();
     }

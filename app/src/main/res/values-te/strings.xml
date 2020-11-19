@@ -45,7 +45,7 @@
     <string name="max_3_allowed">మాక్స్ 3 పిక్చర్స్ అనుమతించబడతాయి</string>
 
     <string name="field_cant_be_empty">ఫీల్డ్ ఖాళీగా ఉండలేరు</string>
-    <string name="enter_valid_number">\"దయచేసి చెల్లుబాటు అయ్యే మొబైల్ నెంబరు నమోదు చేయండి\"</string>
+    <string name="enter_valid_number">దయచేసి చెల్లుబాటు అయ్యే మొబైల్ నెంబరు నమోదు చేయండి</string>
     <string name="no_records_found">రికార్డులు ఏవీ కనుగొనబడలేదు</string>
     <string name="sure_to_complete">మీరు ట్రిప్ని ఖచ్చితంగా పూర్తి చేయాలని అనుకుంటున్నారా?</string>
     <string name="allow">అనుమతించు</string>

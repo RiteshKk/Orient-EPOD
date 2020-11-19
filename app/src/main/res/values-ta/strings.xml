@@ -45,7 +45,7 @@
     <string name="max_3_allowed">அதிகபட்சம் 3 படங்கள் அனுமதிக்கப்படுகின்றன</string>
 
     <string name="field_cant_be_empty">புலம் காலியாக இருக்க முடியாது</string>
-    <string name="enter_valid_number">\"தயவுசெய்து செல்லத்தக்க மொபைல் எண்ணை உள்ளிடவும்\"</string>
+    <string name="enter_valid_number">தயவுசெய்து செல்லத்தக்க மொபைல் எண்ணை உள்ளிடவும்</string>
     <string name="no_records_found">பதிவேடுகள் எதுவும் இல்லை</string>
     <string name="sure_to_complete">நீங்கள் நிச்சயமாக பயணம் முடிக்க?</string>
     <string name="allow">ஒத்துக்கொள்</string>

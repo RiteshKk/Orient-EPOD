@@ -55,7 +55,7 @@
     <string name="uploaded">Uploaded.</string>
     <string name="max_3_allowed">Max 3 Images are allowed</string>
     <string name="field_cant_be_empty">Field can\'t be empty</string>
-    <string name="enter_valid_number">\"Please enter valid mobile number\"</string>
+    <string name="enter_valid_number">Please enter valid mobile number</string>
     <string name="no_records_found">No records found</string>
     <string name="sure_to_complete">Are you sure to complete the Trip?</string>
     <string name="allow">Allow</string>

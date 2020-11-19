@@ -69,7 +69,18 @@ public class Receiver implements Parcelable {
     private int isComplete;
     private String location;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private int id = -1;
+
     protected Receiver(Parcel in) {
+        id = in.readInt();
         name = in.readString();
         phone = in.readString();
         invoiceNumber = in.readString();
@@ -101,6 +112,7 @@ public class Receiver implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(phone);
         dest.writeString(invoiceNumber);
