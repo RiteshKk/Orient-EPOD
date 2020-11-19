@@ -283,6 +283,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             if (viewModel.isCompleteTripChecked().getValue()) {
                 isFinalSubmit = true;
             }
+            hideKeyboard(binding.getRoot(),requireContext());
             onSubmitClick();
         });
 
