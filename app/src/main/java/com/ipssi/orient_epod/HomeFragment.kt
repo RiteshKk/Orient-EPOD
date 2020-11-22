@@ -15,6 +15,7 @@ import com.ipssi.orient_epod.adapter.InvoiceAdapter
 import com.ipssi.orient_epod.callbacks.OnInvoiceSelectedListener
 import com.ipssi.orient_epod.databinding.FragmentMainBinding
 import com.ipssi.orient_epod.location.CoreUtility
+import com.ipssi.orient_epod.location.CoreUtility.Companion.cancelBackgroundWorker
 import com.ipssi.orient_epod.location.LocationUtils
 import com.ipssi.orient_epod.location.LocationUtils.Companion.LOCATION_REQUEST
 import com.ipssi.orient_epod.login.SharedViewModel
@@ -22,6 +23,7 @@ import com.ipssi.orient_epod.model.Credentials
 import com.ipssi.orient_epod.model.Invoice
 import com.ipssi.orient_epod.remote.remote.util.Status
 import com.ipssi.orient_epod.remote.util.AppConstant
+import com.ipssi.orient_epod.service.LocationScanningService
 
 
 class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLocationListener {
@@ -52,17 +54,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
         super.onStart()
         getUpdatedData()
         handleBackPress()
-        // for Continuous Location update
-        if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
-            if (CoreUtility.isLocationOn(requireContext())) {
-                configureService(requireContext())
-                CoreUtility.startBackgroundWorker()
-            } else {
-                CoreUtility.enableLocation(requireActivity(), this)
-            }
-        } else {
-            CoreUtility.requestPermissions(this, 2001)
-        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -119,6 +111,17 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
                     Status.SUCCESS -> {
                         resource.data.let { dao ->
                             (binding.invoiceList.adapter as InvoiceAdapter).setData(dao?.invoices)
+                            // for Continuous Location update
+                            if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
+                                if (CoreUtility.isLocationOn(requireContext())) {
+                                    configureService(requireContext())
+                                    CoreUtility.startBackgroundWorker()
+                                } else {
+                                    CoreUtility.enableLocation(requireActivity(), this)
+                                }
+                            } else {
+                                CoreUtility.requestPermissions(this, 2001)
+                            }
                         }
                         viewModel.isLoading.value = false
                     }
@@ -127,6 +130,8 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
                     }
                     Status.ERROR -> {
                         viewModel.isLoading.value = false
+                        requireActivity().stopService(Intent(requireContext(), LocationScanningService::class.java))
+                        cancelBackgroundWorker()
                         showAlertDialog(requireActivity(), resource.message)
                     }
                     Status.OFFLINE -> {

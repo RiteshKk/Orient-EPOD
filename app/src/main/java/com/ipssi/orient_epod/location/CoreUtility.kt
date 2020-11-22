@@ -108,12 +108,17 @@ class CoreUtility {
                     .addTag("periodicWorkRequest")
                     .setConstraints(constraints)
                     .build()
-            workManager.enqueue(workRequest)
-            /* workManager.enqueueUniquePeriodicWork(
-                     BackgroundWorker.UNIQUE_WORK_NAME,
-                     ExistingPeriodicWorkPolicy.REPLACE,
-                     workRequest
-             )*/
+            workManager.enqueueUniquePeriodicWork(
+                    BackgroundWorker.UNIQUE_WORK_NAME,
+                    ExistingPeriodicWorkPolicy.REPLACE,
+                    workRequest
+            )
+        }
+
+        fun cancelBackgroundWorker() {
+            Log.d("[cancelWorker]", "cancelling workmanager")
+            val workManager = WorkManager.getInstance(OrientApp.instance)
+            workManager.cancelAllWorkByTag("periodicWorkRequest")
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.ipssi.orient_epod.remote.util
 
 object AppConstant {
-
+    const val INDEX = "index"
     const val SELECTED_LANGUAGE = "SELECTED_LANG"
     const val IS_FIRST_LAUNCH = "isFirstLaunch"
     const val PLEASE_ALLOW_LOCATION  = "Please allow location permission for getting your location details"

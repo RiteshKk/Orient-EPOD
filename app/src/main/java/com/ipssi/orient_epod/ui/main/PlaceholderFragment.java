@@ -20,6 +20,7 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,9 +68,11 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     private boolean isFinalSubmit = false;
     private boolean hasError = false;
     private Invoice invoice;
+    private int receiverId = 0;
 
-    public static PlaceholderFragment newInstance(Invoice invoice, Receiver receiver) {
+    public static PlaceholderFragment newInstance(int index, Invoice invoice, Receiver receiver) {
         Bundle bundle = new Bundle();
+        bundle.putInt(AppConstant.INDEX, index);
         bundle.putParcelable(AppConstant.INVOICE, invoice);
         bundle.putParcelable(AppConstant.RECEIVER, receiver);
         PlaceholderFragment fragment = new PlaceholderFragment();
@@ -100,6 +103,8 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
         init();
 
+        setupForLastReceiver();
+
         handleClickListener();
 
         setObserver();
@@ -108,6 +113,25 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
         binding.imageList.setAdapter(adapter);
 
         getUploadedDocs();
+    }
+
+    private void setupForLastReceiver() {
+        int index = getArguments().getInt(AppConstant.INDEX, 0);
+        if (index == 3) {
+            viewModel.isCompleteTripChecked().setValue(true);
+            binding.chechBoxCompleteTrip.setOnClickListener((buttonView) -> {
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+                builder.setTitle("Alert").setMessage("No More Receiver").setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            dialog.dismiss();
+                            viewModel.isCompleteTripChecked().setValue(true);
+                        }
+                ).show();
+            });
+        }else{
+            binding.chechBoxCompleteTrip.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+                viewModel.isCompleteTripChecked().setValue(isChecked);
+            }));
+        }
     }
 
     private void getUploadedDocs() {
@@ -154,7 +178,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                 if (s.length() > 0) {
                     String damageBagsValue = viewModel.getDamageBags().getValue();
                     if (!damageBagsValue.isEmpty()) {
-                        int damagedBags = Integer.parseInt(damageBagsValue);
+                        int damagedBags = Integer.parseInt(damageBagsValue.trim());
                         int receivedBags = Integer.parseInt(s);
                         if (damagedBags > receivedBags) {
                             hasError = true;
@@ -208,7 +232,6 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                     break;
             }
         });
-
         viewModel.getImageDeleteObserver().observe(getViewLifecycleOwner(), (epodResponseResource) -> {
             switch (epodResponseResource.getStatus()) {
                 case ERROR:
@@ -224,7 +247,6 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
             }
         });
-
         viewModel.getImageList().observe(getViewLifecycleOwner(), (imageList) -> {
             switch (imageList.getStatus()) {
                 case LOADING:
@@ -241,14 +263,14 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                     break;
             }
         });
-
         viewModel.getSaveReceiverResponse().observe(getViewLifecycleOwner(), saveReceiverResponse -> {
             switch (saveReceiverResponse.getStatus()) {
                 case SUCCESS:
                     Snackbar.make(binding.getRoot(), saveReceiverResponse.getData().getMessage(), Snackbar.LENGTH_SHORT).show();
                     try {
-                        InvoiceDetailsActivity.totalDamage += Integer.parseInt(binding.layoutDamageBags.getEditText().getText().toString());
-                        InvoiceDetailsActivity.inputQuantity += Integer.parseInt(binding.layoutBags.getEditText().getText().toString());
+                        receiverId = saveReceiverResponse.getData().getStatus();
+                        InvoiceDetailsActivity.totalDamage += Integer.parseInt(binding.layoutDamageBags.getEditText().getText().toString().trim());
+                        InvoiceDetailsActivity.inputQuantity += Integer.parseInt(binding.layoutBags.getEditText().getText().toString().trim());
                     } catch (NumberFormatException e) {
                     }
                     if (isFinalSubmit) {
@@ -274,7 +296,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
 
     private void handleClickListener() {
         binding.sign.setOnClickListener(v -> {
-            hideKeyboard(binding.getRoot(),requireContext());
+            hideKeyboard(binding.getRoot(), requireContext());
             SignatureDialogFragment dialogFragment = new SignatureDialogFragment(PlaceholderFragment.this);
             dialogFragment.show(getChildFragmentManager(), "signature");
         });
@@ -283,7 +305,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             if (viewModel.isCompleteTripChecked().getValue()) {
                 isFinalSubmit = true;
             }
-            hideKeyboard(binding.getRoot(),requireContext());
+            hideKeyboard(binding.getRoot(), requireContext());
             onSubmitClick();
         });
 
@@ -295,19 +317,6 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                 showSnackbar(getString(R.string.max_3_allowed));
             }
         });
-    }
-
-    private void showCompleteTripAlertDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setMessage(R.string.sure_to_complete)
-                .setTitle(R.string.submit_epod)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    isFinalSubmit = true;
-                    onSubmitClick();
-                })
-                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
-                .show();
-
     }
 
     public void checkPermissionAndCaptureImage() {
@@ -435,8 +444,10 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             Invoice invoice = getArguments().getParcelable(AppConstant.INVOICE);
             Receiver receiver = Objects.requireNonNull(getArguments()).getParcelable(AppConstant.RECEIVER);
             int id = -1;
-            if (receiver != null) {
+            if (receiver != null && receiver.getId() > 0) {
                 id = receiver.getId();
+            } else if (receiverId > 0) {
+                id = receiverId;
             }
             viewModel.saveReceiver(id, invoice.getInvoiceNumber(), invoice.getLoadType().equalsIgnoreCase("standard") ? 0 : 1, loc, isFinalSubmit);
         }

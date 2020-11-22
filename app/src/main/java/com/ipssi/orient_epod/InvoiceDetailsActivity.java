@@ -20,6 +20,7 @@ import com.ipssi.orient_epod.location.CoreUtility;
 import com.ipssi.orient_epod.model.Invoice;
 import com.ipssi.orient_epod.model.Receiver;
 import com.ipssi.orient_epod.remote.util.AppConstant;
+import com.ipssi.orient_epod.service.LocationScanningService;
 import com.ipssi.orient_epod.ui.main.PlaceholderFragment;
 import com.ipssi.orient_epod.ui.main.SectionsPagerAdapter;
 
@@ -56,9 +57,9 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
         binding.setLifecycleOwner(this);
         Invoice model = (Invoice) getIntent().getParcelableExtra(AppConstant.MODEL);
         try {
-            totalQuantity = 20 * Integer.parseInt(model.getInvoiceQuantity());
-        }catch(Exception e){
-            Log.e("NumberFormatException",e.getMessage());
+            totalQuantity = (int) (20 * Float.parseFloat(model.getInvoiceQuantity().trim()));
+        } catch (Exception e) {
+            Log.e("NumberFormatException", e.getMessage());
             totalQuantity = 0;
         }
         StringBuilder address = new StringBuilder();
@@ -69,10 +70,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
             address.append(address.length() > 0 ? "\n" : "");
             address.append(model.getShiptopartyAddress1());
         }
-        if (model.getShiptopartyAddress2() != null && !model.getShiptopartyAddress2().isEmpty()) {
-            address.append(address.length() > 0 ? "\n" : "");
-            address.append(model.getShiptopartyAddress2());
-        }
+
         model.setShiptopartyAddress(address.toString());
         binding.setModel(model);
 
@@ -111,19 +109,23 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
                     for (int i = 0; data != null && i < data.size(); i++) {
                         if (i < 3) {
                             Receiver receiverModel = data.get(i);
-                            totalDamage += Integer.parseInt(receiverModel.getShortage());
-                            inputQuantity += Integer.parseInt(receiverModel.getBagsRecv());
+                            try {
+                                totalDamage += Integer.parseInt(receiverModel.getShortage().trim());
+                                inputQuantity += Integer.parseInt(receiverModel.getBagsRecv().trim());
+                            }catch(NumberFormatException e){
+                                Log.e("[NumberFormatException]",e.getMessage());
+                            }
                         }
                     }
                     Receiver receiver = null;
                     if (data == null || data.size() == 0) {
-                        receiver = new Receiver(model.getShiptopartyName(),model.getShiptopartyMobileno(),"","","",model.getLoadType().equalsIgnoreCase("standard")?0:1,"","",1,null);
-                    }else{
+                        receiver = new Receiver(model.getShiptopartyName(), model.getShiptopartyMobileno(), "", "", "", model.getLoadType().equalsIgnoreCase("standard") ? 0 : 1, "", "", 1, null);
+                    } else {
                         receiver = data.get(0);
                     }
-                    fragments.add(PlaceholderFragment.newInstance(model, receiver));
-                    fragments.add(PlaceholderFragment.newInstance(model, (data != null && data.size() > 1) ? data.get(1) : null));
-                    fragments.add(PlaceholderFragment.newInstance(model, (data != null && data.size() > 2) ? data.get(2) : null));
+                    fragments.add(PlaceholderFragment.newInstance(1,model, receiver));
+                    fragments.add(PlaceholderFragment.newInstance(2,model, (data != null && data.size() > 1) ? data.get(1) : null));
+                    fragments.add(PlaceholderFragment.newInstance(3,model, (data != null && data.size() > 2) ? data.get(2) : null));
                     SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), fragments);
                     binding.viewPager.setAdapter(sectionsPagerAdapter);
                     binding.tabLayout.setupWithViewPager(binding.viewPager);
@@ -152,7 +154,13 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_logout) {
             SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
-            preferences.edit().clear().apply();
+            stopService(new Intent(this, LocationScanningService.class));
+            CoreUtility.Companion.cancelBackgroundWorker();
+            preferences.edit().putString(AppConstant.TRANSPORTER_CODE, null)
+                    .putString(AppConstant.VEHICLE_NUMBER, null)
+                    .putString(AppConstant.SHIPMENT_NUMBER, null)
+                    .putBoolean(AppConstant.IS_LOGIN, false)
+                    .apply();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);

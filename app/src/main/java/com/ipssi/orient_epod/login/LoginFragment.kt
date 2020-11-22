@@ -88,11 +88,11 @@ class LoginFragment : Fragment() {
                         resource.data.let {
                             if (resource.data?.invoices?.size ?: 0 > 0) {
                                 requireActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).edit()
-                                    .putString(AppConstant.TRANSPORTER_CODE, binding.transporterCode.text.toString())
-                                    .putString(AppConstant.VEHICLE_NUMBER, binding.truckNumber.text.toString())
+                                        .putString(AppConstant.TRANSPORTER_CODE, binding.transporterCode.text.toString())
+                                        .putString(AppConstant.VEHICLE_NUMBER, binding.truckNumber.text.toString())
                                         .putString(AppConstant.SHIPMENT_NUMBER, resource.data?.invoices?.get(0)?.shipmentNumber)
-                                    .putBoolean(AppConstant.IS_LOGIN, true)
-                                    .apply()
+                                        .putBoolean(AppConstant.IS_LOGIN, true)
+                                        .apply()
                                 loginListener.onLoginSuccess()
                             } else {
                                 Snackbar.make(binding.root, getString(R.string.no_records_found), Snackbar.LENGTH_LONG).show()
