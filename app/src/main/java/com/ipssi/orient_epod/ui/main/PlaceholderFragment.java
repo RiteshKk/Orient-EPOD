@@ -14,9 +14,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -224,7 +226,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                     showSnackbar(imageResponseResource.getMessage());
                     break;
                 case OFFLINE:
-                    showAlertDialog(requireActivity(), imageResponseResource.getMessage());
+                    showAlertDialog(requireActivity(), imageResponseResource.getMessage(),null);
                     break;
                 case SUCCESS:
                     showSnackbar(getString(R.string.uploaded));
@@ -236,7 +238,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             switch (epodResponseResource.getStatus()) {
                 case ERROR:
                 case OFFLINE:
-                    showAlertDialog(requireActivity(), epodResponseResource.getMessage());
+                    showAlertDialog(requireActivity(), epodResponseResource.getMessage(),null);
                     break;
                 case LOADING:
                     break;
@@ -255,7 +257,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                 case ERROR:
                 case OFFLINE:
                     viewModel.isLoading().setValue(false);
-                    showAlertDialog(requireActivity(), imageList.getMessage());
+                    showAlertDialog(requireActivity(), imageList.getMessage(),null);
                     break;
                 case SUCCESS:
                     viewModel.isLoading().setValue(false);
@@ -272,9 +274,10 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                         InvoiceDetailsActivity.totalDamage += Integer.parseInt(binding.layoutDamageBags.getEditText().getText().toString().trim());
                         InvoiceDetailsActivity.inputQuantity += Integer.parseInt(binding.layoutBags.getEditText().getText().toString().trim());
                     } catch (NumberFormatException e) {
+                        Log.e("placeHolderFragment",e.getLocalizedMessage());
                     }
                     if (isFinalSubmit) {
-                        new Handler().postDelayed(() -> requireActivity().finish(), 2000
+                        new Handler(Looper.myLooper()).postDelayed(() -> requireActivity().finish(), 2000
                         );
                     }
                     Objects.requireNonNull(binding.totalDamage.getEditText()).setText(String.valueOf(InvoiceDetailsActivity.totalDamage));
@@ -284,7 +287,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                 case ERROR:
                 case OFFLINE:
                     viewModel.isLoading().setValue(false);
-                    showAlertDialog(requireActivity(), saveReceiverResponse.getMessage());
+                    showAlertDialog(requireActivity(), saveReceiverResponse.getMessage(),null);
                     break;
                 case LOADING:
                     viewModel.isLoading().setValue(true);

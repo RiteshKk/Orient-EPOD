@@ -27,6 +27,7 @@ import com.ipssi.orient_epod.ui.main.SectionsPagerAdapter;
 import java.util.ArrayList;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static com.ipssi.orient_epod.UtilKt.logout;
 import static com.ipssi.orient_epod.UtilKt.showAlertDialog;
 
 public class InvoiceDetailsActivity extends AppCompatActivity {
@@ -55,7 +56,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.setLifecycleOwner(this);
-        Invoice model = (Invoice) getIntent().getParcelableExtra(AppConstant.MODEL);
+        Invoice model = getIntent().getParcelableExtra(AppConstant.MODEL);
         try {
             totalQuantity = (int) (20 * Float.parseFloat(model.getInvoiceQuantity().trim()));
         } catch (Exception e) {
@@ -104,7 +105,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
             switch (receivers.getStatus()) {
                 case SUCCESS:
                     ArrayList<Receiver> data = receivers.getData();
-                    Invoice model = (Invoice) getIntent().getParcelableExtra(AppConstant.MODEL);
+                    Invoice model = getIntent().getParcelableExtra(AppConstant.MODEL);
                     ArrayList<PlaceholderFragment> fragments = new ArrayList<>();
                     for (int i = 0; data != null && i < data.size(); i++) {
                         if (i < 3) {
@@ -134,7 +135,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
                 case ERROR:
                 case OFFLINE:
                     binding.loadingLayout.setVisibility(View.GONE);
-                    showAlertDialog(this, receivers.getMessage());
+                    showAlertDialog(this, receivers.getMessage(),null);
                     break;
                 case LOADING:
                     binding.loadingLayout.setVisibility(View.VISIBLE);
@@ -153,17 +154,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_logout) {
-            SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
-            stopService(new Intent(this, LocationScanningService.class));
-            CoreUtility.Companion.cancelBackgroundWorker();
-            preferences.edit().putString(AppConstant.TRANSPORTER_CODE, null)
-                    .putString(AppConstant.VEHICLE_NUMBER, null)
-                    .putString(AppConstant.SHIPMENT_NUMBER, null)
-                    .putBoolean(AppConstant.IS_LOGIN, false)
-                    .apply();
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            logout(this);
         } else if (item.getItemId() == android.R.id.home) {
             finish();
         } else if (item.getItemId() == R.id.menu_change_language) {

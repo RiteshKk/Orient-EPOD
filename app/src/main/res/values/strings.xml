@@ -36,7 +36,7 @@
     <string name="download">Download</string>
     <string name="invoices_for_epod">Invoices for EPOD</string>
     <string name="logout">Logout</string>
-    <string name="bags_received">Bags Received</string>
+    <string name="bags_received">Bags/Qty Received</string>
     <string name="remarks">Remarks (If Any)</string>
     <string name="bags_damage">Shortage/Damage (Bags/Qty)</string>
     <string name="total_shortage">Total Shortage/Damage(Bag/MT)</string>
@@ -66,5 +66,6 @@
     <string name="complete_trip">Complete Trip</string>
     <string name="want_to_complete_trip">I want to complete this trip.</string>
     <string name="load_type">Load Type</string>
+    <string name="all_invoices_complete">All Invoices completed, Logging out</string>
 
 </resources>

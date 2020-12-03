@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity implements OnLoginListener {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_logout) {
-            SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
+            UtilKt.logout(this);
+           /* SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
             stopService(new Intent(this, LocationScanningService.class));
             CoreUtility.Companion.cancelBackgroundWorker();
             preferences.edit().putString(AppConstant.TRANSPORTER_CODE, null)
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnLoginListener {
                     .apply();
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            startActivity(intent);*/
         } else if (item.getItemId() == R.id.menu_change_language) {
             Intent intent = new Intent(this, LanguageSelectorActivity.class);
             startActivity(intent);

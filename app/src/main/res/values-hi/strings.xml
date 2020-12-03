@@ -62,5 +62,5 @@
     <string name="accept">स्वीकार करें</string>
     <string name="close">बंद करे</string>
     <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul><li>&nbsp;Location to capture appropriate delivery point and delivery visibility to our customer.</li><li>&nbsp;Camera and Storage to facilitate you upload stamped invoice copy.</li></ul>]]></string>
-
+    <string name="all_invoices_complete">सभी चालान पूरे, लॉग आउट</string>
 </resources>

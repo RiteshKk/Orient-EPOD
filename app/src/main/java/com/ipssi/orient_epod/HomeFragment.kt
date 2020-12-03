@@ -2,6 +2,7 @@ package com.ipssi.orient_epod
 
 import android.app.Activity.RESULT_OK
 import android.content.Context.MODE_PRIVATE
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
@@ -110,17 +111,21 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
                 when (resource.status) {
                     Status.SUCCESS -> {
                         resource.data.let { dao ->
-                            (binding.invoiceList.adapter as InvoiceAdapter).setData(dao?.invoices)
-                            // for Continuous Location update
-                            if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
-                                if (CoreUtility.isLocationOn(requireContext())) {
-                                    configureService(requireContext())
-                                    CoreUtility.startBackgroundWorker()
+                            if (dao?.invoices?.size ?: 0 > 0) {
+                                (binding.invoiceList.adapter as InvoiceAdapter).setData(dao?.invoices)
+                                // for Continuous Location update
+                                if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
+                                    if (CoreUtility.isLocationOn(requireContext())) {
+                                        configureService(requireContext())
+                                        CoreUtility.startBackgroundWorker()
+                                    } else {
+                                        CoreUtility.enableLocation(requireActivity(), this)
+                                    }
                                 } else {
-                                    CoreUtility.enableLocation(requireActivity(), this)
+                                    CoreUtility.requestPermissions(this, 2001)
                                 }
                             } else {
-                                CoreUtility.requestPermissions(this, 2001)
+                                showAlertDialog(requireActivity(), getString(R.string.all_invoices_complete), clickListener)
                             }
                         }
                         viewModel.isLoading.value = false
@@ -148,5 +153,12 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
             configureService(requireContext())
             CoreUtility.startBackgroundWorker()
         }
+    }
+
+    private val clickListener = DialogInterface.OnClickListener { dialog, _ ->
+        requireActivity().stopService(Intent(requireContext(), LocationScanningService::class.java))
+        cancelBackgroundWorker()
+        logout(requireContext())
+        dialog?.dismiss()
     }
 }
