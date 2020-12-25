@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.work.Constraints
@@ -17,6 +19,7 @@ import com.ipssi.orient_epod.OrientApp
 import com.ipssi.orient_epod.remote.util.AppConstant
 import com.ipssi.orient_epod.service.BackgroundWorker
 import java.util.concurrent.TimeUnit
+
 
 /**
  * @author Ritesh Kumar
@@ -119,6 +122,22 @@ class CoreUtility {
             Log.d("[cancelWorker]", "cancelling workmanager")
             val workManager = WorkManager.getInstance(OrientApp.instance)
             workManager.cancelAllWorkByTag("periodicWorkRequest")
+        }
+
+        fun checkPermission(context: Activity, permission: String?): Boolean {
+            return if (Build.VERSION.SDK_INT >= 23) {
+                val result = ContextCompat.checkSelfPermission(context, permission!!)
+                result == PackageManager.PERMISSION_GRANTED
+            } else {
+                true
+            }
+        }
+
+        fun requestPermission(activity: Activity,permission: String,PERMISSION_REQUEST_CODE :Int) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                Toast.makeText(activity, "Phone state permission allows us to get phone number. Please allow it for additional functionality.", Toast.LENGTH_LONG).show()
+            }
+            ActivityCompat.requestPermissions(activity, arrayOf(permission), PERMISSION_REQUEST_CODE)
         }
     }
 }

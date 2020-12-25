@@ -21,10 +21,14 @@ import java.io.IOException
 
 
 class SharedViewModel : ViewModel() {
+    lateinit var vehicle: String
+    lateinit var mobileNumber: String
     var isLoading = MutableLiveData<Boolean>().apply { value = false }
     var shipmentDetailsData = MutableLiveData<Resource<DriverShipmentDao>>()
+    var otpLiveData = MutableLiveData<Resource<String?>>()
 
     fun getShipmentDetails(credentials: Credentials) {
+        Log.d("getShipmentDetails", credentials.toString())
         viewModelScope.launch(Dispatchers.IO) {
             shipmentDetailsData.postValue(Resource.loading(null))
             try {
@@ -40,11 +44,31 @@ class SharedViewModel : ViewModel() {
                     is IOException -> {
                         shipmentDetailsData.postValue(Resource.offline(null, OFFLINE_ERROR))
                     }
-                    is HttpException -> {
-                        shipmentDetailsData.postValue(Resource.error(null, GENERIC_ERROR))
-                    }
                     else -> {
                         shipmentDetailsData.postValue(Resource.error(null, GENERIC_ERROR))
+                    }
+                }
+            }
+        }
+    }
+
+    fun getOTP() {
+        viewModelScope.launch(Dispatchers.IO) {
+            otpLiveData.postValue(Resource.loading(null))
+            try {
+                val driverOTP = ApiHelper(ApiClient.getApiService()).getDriverOTP(mobileNumber)
+                if (driverOTP.isSuccessful) {
+                    otpLiveData.postValue(Resource.success(driverOTP.body()))
+                } else {
+                    otpLiveData.postValue(Resource.error(null, GENERIC_ERROR))
+                }
+            } catch (ex: Exception) {
+                when (ex) {
+                    is IOException -> {
+                        otpLiveData.postValue(Resource.offline(null, OFFLINE_ERROR))
+                    }
+                    else -> {
+                        otpLiveData.postValue(Resource.error(null, GENERIC_ERROR))
                     }
                 }
             }

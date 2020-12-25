@@ -17,12 +17,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.Spanned;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,8 +51,11 @@ import com.ipssi.orient_epod.model.UploadDocumentEntity;
 import com.ipssi.orient_epod.remote.remote.util.Resource;
 import com.ipssi.orient_epod.remote.util.AppConstant;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
@@ -129,7 +134,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                         }
                 ).show();
             });
-        }else{
+        } else {
             binding.chechBoxCompleteTrip.setOnCheckedChangeListener(((buttonView, isChecked) -> {
                 viewModel.isCompleteTripChecked().setValue(isChecked);
             }));
@@ -143,7 +148,18 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     private void init() {
         Receiver receiver = Objects.requireNonNull(getArguments()).getParcelable(AppConstant.RECEIVER);
         binding.totalDamage.getEditText().setText(String.valueOf(InvoiceDetailsActivity.totalDamage));
-        binding.loadType.getEditText().setText(invoice.getLoadType().equalsIgnoreCase("Standard") ? "Bags" : "MT");
+        if (invoice.getLoadType().equalsIgnoreCase("Standard")) {
+            binding.loadType.getEditText().setText("Bags");
+        } else {
+            binding.loadType.getEditText().setText("MT");
+            binding.layoutBags.setHint(getString(R.string.actual_weightment));
+            binding.layoutBags.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            binding.layoutDamageBags.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            binding.layoutBags.getEditText().setFilters(new InputFilter[]{new DecimalDigitsInputFilter(5, 3)});
+            binding.chechBoxCompleteTrip.setVisibility(View.GONE);
+            viewModel.isCompleteTripChecked().setValue(true);
+        }
+
         if (receiver != null) {
             viewModel.getName().setValue(receiver.getName());
             viewModel.getMobile().setValue(receiver.getMobile());
@@ -177,43 +193,58 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             hasError = false;
             binding.layoutBags.setError(null);
             if (viewModel.isEditable().getValue()) {
-                if (s.length() > 0) {
-                    String damageBagsValue = viewModel.getDamageBags().getValue();
-                    if (!damageBagsValue.isEmpty()) {
-                        int damagedBags = Integer.parseInt(damageBagsValue.trim());
-                        int receivedBags = Integer.parseInt(s);
-                        if (damagedBags > receivedBags) {
-                            hasError = true;
-                            binding.layoutBags.setError("Damage bags quantity can not exceed Received bags quantity");
-                        }
+                if (s.length() <= 0) {
+                    if (!invoice.getLoadType().equalsIgnoreCase("standard")) {
+                        binding.layoutDamageBags.getEditText().setText("");
+                        binding.totalDamage.getEditText().setText("");
                     }
                 }
 
                 try {
-                    if (InvoiceDetailsActivity.totalQuantity < InvoiceDetailsActivity.inputQuantity + Integer.parseInt(s)) {
+                    if (!invoice.getLoadType().equalsIgnoreCase("standard")) {
+                        if ((InvoiceDetailsActivity.totalQuantity / 20f) < (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + Integer.parseInt(s))) {
+                            hasError = true;
+                            binding.layoutBags.setError("You have only " + (InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " bags available");
+                        } else {
+                            float totalQuality = (InvoiceDetailsActivity.totalQuantity / 20f) - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage);
+                            float enteredValue = Float.parseFloat(s);
+                            float remainingBags = totalQuality - enteredValue;
+                            DecimalFormat df = new DecimalFormat("###.###");
+                            binding.layoutDamageBags.getEditText().setText(df.format(remainingBags));
+                            binding.totalDamage.getEditText().setText(df.format(remainingBags));
+                            binding.layoutBags.setError(null);
+                        }
+                    } else if (InvoiceDetailsActivity.totalQuantity < (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + Integer.parseInt(s))) {
                         hasError = true;
-                        binding.layoutBags.setError("Bags quantity can not exceed total quantity");
+                        binding.layoutBags.setError("You have only " + (InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " bags available");
                     }
                 } catch (Exception e) {
                 }
             }
-
         });
         viewModel.getDamageBags().observe(getViewLifecycleOwner(), s -> {
             binding.layoutDamageBags.setError(null);
             hasError = false;
-            if (s.length() > 0) {
-                String receivedBagsValue = viewModel.getBagsReceived().getValue();
-                if (!receivedBagsValue.isEmpty()) {
-                    int receivedBags = Integer.parseInt(receivedBagsValue);
-                    int damageBags = Integer.parseInt(s);
-                    if (damageBags > receivedBags) {
-                        hasError = true;
-                        binding.layoutDamageBags.setError("Damage bags quantity can not exceed Received bags quantity");
+            if (viewModel.isEditable().getValue()) {
+                if (s.length() > 0) {
+                    if (invoice.getLoadType().equalsIgnoreCase("standard")) {
+                        String receivedBagsValue = viewModel.getBagsReceived().getValue();
+                        if (!receivedBagsValue.isEmpty()) {
+                            int receivedBags = Integer.parseInt(receivedBagsValue);
+                            int damageBags = Integer.parseInt(s);
+                        /*if (damageBags > receivedBags) {
+                            hasError = true;
+                            binding.layoutDamageBags.setError("Damage bags quantity can not exceed Received bags quantity");
+                        }else*/
+                            if (InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + receivedBags + damageBags) < 0) {
+                                hasError = true;
+                                binding.layoutDamageBags.setError("Only " + (InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + receivedBags)) + " bags available");
+                            }
+                        } else {
+                            hasError = true;
+                            binding.layoutBags.setError("Enter Received bags quantity");
+                        }
                     }
-                } else {
-                    hasError = true;
-                    binding.layoutBags.setError("Enter Received bags quantity");
                 }
             }
         });
@@ -226,7 +257,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                     showSnackbar(imageResponseResource.getMessage());
                     break;
                 case OFFLINE:
-                    showAlertDialog(requireActivity(), imageResponseResource.getMessage(),null);
+                    showAlertDialog(requireActivity(), imageResponseResource.getMessage(), null);
                     break;
                 case SUCCESS:
                     showSnackbar(getString(R.string.uploaded));
@@ -238,7 +269,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             switch (epodResponseResource.getStatus()) {
                 case ERROR:
                 case OFFLINE:
-                    showAlertDialog(requireActivity(), epodResponseResource.getMessage(),null);
+                    showAlertDialog(requireActivity(), epodResponseResource.getMessage(), null);
                     break;
                 case LOADING:
                     break;
@@ -257,7 +288,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                 case ERROR:
                 case OFFLINE:
                     viewModel.isLoading().setValue(false);
-                    showAlertDialog(requireActivity(), imageList.getMessage(),null);
+                    showAlertDialog(requireActivity(), imageList.getMessage(), null);
                     break;
                 case SUCCESS:
                     viewModel.isLoading().setValue(false);
@@ -271,10 +302,11 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                     Snackbar.make(binding.getRoot(), saveReceiverResponse.getData().getMessage(), Snackbar.LENGTH_SHORT).show();
                     try {
                         receiverId = saveReceiverResponse.getData().getStatus();
-                        InvoiceDetailsActivity.totalDamage += Integer.parseInt(binding.layoutDamageBags.getEditText().getText().toString().trim());
-                        InvoiceDetailsActivity.inputQuantity += Integer.parseInt(binding.layoutBags.getEditText().getText().toString().trim());
+                        int totalDamage = Integer.parseInt(binding.layoutDamageBags.getEditText().getText().toString().trim());
+                        InvoiceDetailsActivity.totalDamage += totalDamage;
+                        InvoiceDetailsActivity.totalDeliveredQuantity += Integer.parseInt(binding.layoutBags.getEditText().getText().toString().trim());
                     } catch (NumberFormatException e) {
-                        Log.e("placeHolderFragment",e.getLocalizedMessage());
+                        Log.e("placeHolderFragment", e.getLocalizedMessage());
                     }
                     if (isFinalSubmit) {
                         new Handler(Looper.myLooper()).postDelayed(() -> requireActivity().finish(), 2000
@@ -287,7 +319,7 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
                 case ERROR:
                 case OFFLINE:
                     viewModel.isLoading().setValue(false);
-                    showAlertDialog(requireActivity(), saveReceiverResponse.getMessage(),null);
+                    showAlertDialog(requireActivity(), saveReceiverResponse.getMessage(), null);
                     break;
                 case LOADING:
                     viewModel.isLoading().setValue(true);
@@ -377,23 +409,45 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
             binding.layoutMobile.setError(getString(R.string.enter_valid_number));
             return;
         }
-        String bagsReceived = Objects.requireNonNull(binding.layoutBags.getEditText()).getText().toString();
-        if (bagsReceived.isEmpty()) {
-            binding.layoutBags.setError(getString(R.string.field_cant_be_empty));
-            return;
-        }
         if (hasError) {
             return;
         }
 
+        if (isFinalSubmit) {
+            String damageBagsValue = binding.layoutDamageBags.getEditText().getText().toString();
+            String receivedBagsValue = binding.layoutBags.getEditText().getText().toString();
+            float damagedBags = 0f;
+            float receivedBags = 0f;
+            try {
+                damagedBags = Float.parseFloat(damageBagsValue.trim());
+            } catch (Exception e2) {
+                Log.e("damageBagsError", e2.getMessage());
+            }
+            try {
+                receivedBags = Float.parseFloat(receivedBagsValue.trim());
+            } catch (Exception ex) {
+                Log.e("receivedBags Error", ex.getMessage());
+            }
+            if (InvoiceDetailsActivity.totalQuantity != (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags)) {
+                Snackbar.make(binding.getRoot(), InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags) + " bags still not delivered. Please deliver all bags before completing trip", Snackbar.LENGTH_LONG).show();
+                return;
+            }
+        }
+
         BitmapDrawable bitmapDrawable = (BitmapDrawable) binding.sign.getDrawable();
         if (bitmapDrawable == null) {
-            Snackbar.make(binding.getRoot(), R.string.provide_signature, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.getRoot(), R.string.provide_signature, Snackbar.LENGTH_LONG).show();
             return;
         } else {
             Bitmap image = (bitmapDrawable).getBitmap();
             if (image == null) {
-                Snackbar.make(binding.getRoot(), R.string.provide_signature, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(binding.getRoot(), R.string.provide_signature, Snackbar.LENGTH_LONG).show();
+                return;
+            }
+        }
+        if (!invoice.getLoadType().equalsIgnoreCase("standard")) {
+            if (isFinalSubmit && (viewModel.getImageList().getValue() == null || viewModel.getImageList().getValue().getData() == null || viewModel.getImageList().getValue().getData().size() == 0)) {
+                Snackbar.make(binding.getRoot(), "Document list is empty. Please scan document", Snackbar.LENGTH_LONG).show();
                 return;
             }
         }
@@ -493,5 +547,22 @@ public class PlaceholderFragment extends Fragment implements OnSignedCaptureList
     @Override
     public void onImageDeleteClick(UploadDocumentEntity entity) {
         viewModel.deleteUploadedImage(entity);
+    }
+
+    static class DecimalDigitsInputFilter implements InputFilter {
+        Pattern mPattern;
+
+        public DecimalDigitsInputFilter(int digitsBeforeZero, int digitsAfterZero) {
+            mPattern = Pattern.compile("[0-9]{0," + (digitsBeforeZero - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) + "})?)||(\\.)?");
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+            Matcher matcher = mPattern.matcher(dest);
+            if (!matcher.matches())
+                return "";
+            return null;
+        }
     }
 }

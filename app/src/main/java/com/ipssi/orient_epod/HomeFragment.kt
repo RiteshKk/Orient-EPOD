@@ -6,10 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ipssi.orient_epod.adapter.InvoiceAdapter
@@ -33,7 +30,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
     private lateinit var viewModel: SharedViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         binding.viewModel = viewModel
@@ -45,6 +42,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
         binding.swipeContainer.setOnRefreshListener {
             getUpdatedData()
             binding.swipeContainer.isRefreshing = false
@@ -79,9 +77,9 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
 
     private fun getUpdatedData() {
         val sharedPreferences = requireActivity().getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)
-        val tCode = sharedPreferences.getString(AppConstant.TRANSPORTER_CODE, "") ?: ""
         val vehicleName = sharedPreferences.getString(AppConstant.VEHICLE_NUMBER, "") ?: ""
-        viewModel.getShipmentDetails(Credentials(transporterCode = tCode, vehicleNo = vehicleName))
+        val mobile1 = sharedPreferences.getString(AppConstant.MOBILE_1, "") ?: ""
+        viewModel.getShipmentDetails(Credentials(transporterCode = "", vehicleNo = vehicleName, phone2 = "", phone1 = mobile1))
     }
 
     override fun onInvoiceSelected(invoice: Invoice?) {
@@ -91,6 +89,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
     }
 
     override fun onLrIconClicked(link: String?) {
+        (requireActivity() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         childFragmentManager.beginTransaction().addToBackStack("").replace(R.id.container, WebViewFragment.newInstance(link)).commit()
     }
 
@@ -100,9 +99,18 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
         binding.root.isFocusableInTouchMode = true
         binding.root.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK && childFragmentManager.backStackEntryCount > 0) {
+                (requireActivity() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 childFragmentManager.popBackStackImmediate()
             } else false
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            childFragmentManager.popBackStackImmediate()
+            (requireActivity() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun observeModel() {
@@ -116,6 +124,8 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
                                 // for Continuous Location update
                                 if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
                                     if (CoreUtility.isLocationOn(requireContext())) {
+                                        val prefrences = requireActivity().getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)
+                                        prefrences.edit().putString(AppConstant.SHIPMENT_NUMBER, dao?.invoices?.get(0)?.shipmentNumber).apply()
                                         configureService(requireContext())
                                         CoreUtility.startBackgroundWorker()
                                     } else {
@@ -125,6 +135,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
                                     CoreUtility.requestPermissions(this, 2001)
                                 }
                             } else {
+                                (binding.invoiceList.adapter as InvoiceAdapter).setData(dao?.invoices)
                                 showAlertDialog(requireActivity(), getString(R.string.all_invoices_complete), clickListener)
                             }
                         }

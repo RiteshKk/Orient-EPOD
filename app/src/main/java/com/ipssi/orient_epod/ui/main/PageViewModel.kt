@@ -46,9 +46,10 @@ class PageViewModel : ViewModel() {
             val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
             byteArrayOutputStream.close()
             val encoded = Base64.encodeToString(byteArray, Base64.DEFAULT)
+            val bags = if (bagsReceived.value?.length ?: 0 > 0 ) bagsReceived.value ?: "0" else "0"
+            val damaged = if (damageBags.value?.length ?: 0 > 0 ) damageBags.value ?: "0" else "0"
 
-            val receiver = Receiver(name.value, mobile.value, invoice, bagsReceived.value, damageBags.value
-                    ?: "0", loadType, remarks.value, encoded, if (isFinalSubmit) 2 else 1, "${location.latitude},${location.longitude}")
+            val receiver = Receiver(name.value, mobile.value, invoice, bags, damaged, loadType, remarks.value, encoded, if (isFinalSubmit) 2 else 1, "${location.latitude},${location.longitude}")
             if(id>0){
                 receiver.id = id
             }

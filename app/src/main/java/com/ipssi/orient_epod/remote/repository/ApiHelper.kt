@@ -20,4 +20,5 @@ class ApiHelper(private val apiService: ApiService) {
 
     suspend fun deleteUploadedImage(id: Long) = apiService.getUploadedImage(id)
     suspend fun saveDriverLocation(driverLocationEntity: DriverLocationEntity) = apiService.saveDriverLocation(driverLocationEntity)
+    suspend fun getDriverOTP(mobileNumber: String) = apiService.getOTP(mobileNumber)
 }

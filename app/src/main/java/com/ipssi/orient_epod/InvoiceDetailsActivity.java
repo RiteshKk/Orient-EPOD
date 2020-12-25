@@ -1,7 +1,6 @@
 package com.ipssi.orient_epod;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -13,20 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.downloader.core.Core;
 import com.google.android.material.appbar.AppBarLayout;
 import com.ipssi.orient_epod.databinding.ActivityInvoiceDetailsBinding;
-import com.ipssi.orient_epod.location.CoreUtility;
 import com.ipssi.orient_epod.model.Invoice;
 import com.ipssi.orient_epod.model.Receiver;
 import com.ipssi.orient_epod.remote.util.AppConstant;
-import com.ipssi.orient_epod.service.LocationScanningService;
 import com.ipssi.orient_epod.ui.main.PlaceholderFragment;
 import com.ipssi.orient_epod.ui.main.SectionsPagerAdapter;
 
 import java.util.ArrayList;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static com.ipssi.orient_epod.UtilKt.logout;
 import static com.ipssi.orient_epod.UtilKt.showAlertDialog;
 
@@ -36,14 +31,14 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
 
     public static int totalDamage = 0;
     public static int totalQuantity = 0;
-    public static int inputQuantity = 0;
+    public static int totalDeliveredQuantity = 0;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         totalDamage = 0;
         totalQuantity = 0;
-        inputQuantity = 0;
+        totalDeliveredQuantity = 0;
     }
 
     @Override
@@ -112,7 +107,7 @@ public class InvoiceDetailsActivity extends AppCompatActivity {
                             Receiver receiverModel = data.get(i);
                             try {
                                 totalDamage += Integer.parseInt(receiverModel.getShortage().trim());
-                                inputQuantity += Integer.parseInt(receiverModel.getBagsRecv().trim());
+                                totalDeliveredQuantity += Integer.parseInt(receiverModel.getBagsRecv().trim());
                             }catch(NumberFormatException e){
                                 Log.e("[NumberFormatException]",e.getMessage());
                             }

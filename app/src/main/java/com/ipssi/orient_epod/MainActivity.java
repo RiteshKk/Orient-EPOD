@@ -17,6 +17,7 @@ import com.ipssi.orient_epod.callbacks.OnLoginListener;
 import com.ipssi.orient_epod.databinding.ActivityMainBinding;
 import com.ipssi.orient_epod.location.CoreUtility;
 import com.ipssi.orient_epod.login.LoginFragment;
+import com.ipssi.orient_epod.login.OTPFragment;
 import com.ipssi.orient_epod.remote.util.AppConstant;
 import com.ipssi.orient_epod.service.LocationScanningService;
 
@@ -59,17 +60,6 @@ public class MainActivity extends AppCompatActivity implements OnLoginListener {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_logout) {
             UtilKt.logout(this);
-           /* SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE);
-            stopService(new Intent(this, LocationScanningService.class));
-            CoreUtility.Companion.cancelBackgroundWorker();
-            preferences.edit().putString(AppConstant.TRANSPORTER_CODE, null)
-                    .putString(AppConstant.VEHICLE_NUMBER, null)
-                    .putString(AppConstant.SHIPMENT_NUMBER, null)
-                    .putBoolean(AppConstant.IS_LOGIN, false)
-                    .apply();
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);*/
         } else if (item.getItemId() == R.id.menu_change_language) {
             Intent intent = new Intent(this, LanguageSelectorActivity.class);
             startActivity(intent);
@@ -87,6 +77,13 @@ public class MainActivity extends AppCompatActivity implements OnLoginListener {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Fragment fragment = getSupportFragmentManager().findFragmentByTag("home");
-        fragment.onActivityResult(requestCode, resultCode, data);
+        if (fragment != null) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void showOTPView() {
+        replaceFragment(OTPFragment.class.getName(), "OTP");
     }
 }

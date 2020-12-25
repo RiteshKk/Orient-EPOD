@@ -1,6 +1,8 @@
 package com.ipssi.orient_epod.remote.util
 
 object AppConstant {
+    const val MOBILE_1 = "mobile1"
+    const val MOBILE_2 = "mobile2"
     const val INDEX = "index"
     const val SELECTED_LANGUAGE = "SELECTED_LANG"
     const val IS_FIRST_LAUNCH = "isFirstLaunch"

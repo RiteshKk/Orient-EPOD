@@ -40,16 +40,17 @@
 
 
         <EditText
-            android:id="@+id/transporter_code"
+            android:id="@+id/mobile_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/dp_40"
             android:layout_marginTop="30dp"
             android:background="@drawable/circular_bg"
-            android:drawableStart="@drawable/user"
+            android:drawableStart="@drawable/phone_icon"
             android:gravity="center"
-            android:hint="@string/transporter_code"
+            android:hint="@string/mobile_number"
             android:inputType="number"
+            android:maxLength="13"
             android:padding="7dp"
             android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
@@ -73,7 +74,7 @@
             android:textAllCaps="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/transporter_code" />
+            app:layout_constraintTop_toBottomOf="@id/mobile_number" />
 
 
         <Button

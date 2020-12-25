@@ -24,13 +24,16 @@
             android:theme="@style/progressBar" />
 
 
-        <Button
+        <TextView
             android:id="@+id/btn_download"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:background="@color/colorGreen"
+            android:textAllCaps="true"
+            android:gravity="center"
+            android:paddingVertical="@dimen/dp_15"
             android:text="@string/download"
             android:textColor="@android:color/white" />
     </RelativeLayout>
