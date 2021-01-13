@@ -31,9 +31,11 @@
     <string name="download">பதிவிறக்கம்</string>
     <string name="invoices_for_epod">EPOD க்கான விலைப்பட்டியல்</string>
     <string name="logout">விடு பதிகை</string>
-    <string name="bags_received">பைகள் பெறப்பட்டன</string>
+    <string name="bags_received">பைகள் / பெறப்பட்ட அளவு</string>
+    <string name="bags_received_for_standard">பைகள் பெறப்பட்டன</string>
     <string name="remarks">குறிப்புகள் (ஏதேனும் இருந்தால்)</string>
     <string name="bags_damage">பற்றாக்குறை / சேதம் (பைகள் / க்யூட்டி)</string>
+    <string name="bags_damage_for_standard">பற்றாக்குறை / சேதம் பைகள்</string>
     <string name="total_shortage">மொத்த பற்றாக்குறை / சேதம் (பை / எம்டி)</string>
     <string name="scan_doc">ஆவணங்கள் ஏதேனும் இருந்தால் ஸ்கேன் செய்யுங்கள்</string>
     <string name="upload_image">படத்தை பதிவேற்றம் செய்யவும்</string>

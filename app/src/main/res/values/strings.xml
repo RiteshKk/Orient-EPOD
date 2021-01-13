@@ -37,8 +37,10 @@
     <string name="invoices_for_epod">Invoices for EPOD</string>
     <string name="logout">Logout</string>
     <string name="bags_received">Bags/Qty Received</string>
+    <string name="bags_received_for_standard">Bags Received</string>
     <string name="remarks">Remarks (If Any)</string>
     <string name="bags_damage">Shortage/Damage (Bags/Qty)</string>
+    <string name="bags_damage_for_standard">Shortage/Damage Bags</string>
     <string name="total_shortage">Total Shortage/Damage(Bag/MT)</string>
     <string name="scan_doc">Scan Documents If any</string>
     <string name="upload_image">Upload Image</string>
@@ -71,4 +73,8 @@
     <string name="mobile_number">Mobile Number</string>
     <string name="invalid_number">Invalid Number</string>
     <string name="enter_otp">Waiting for OTP</string>
+    <string name="title_bags">Bags</string>
+    <string name="title_mt">MT</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="timer_message">I didn\'t receive OTP. Resend in %02d:%02d</string>
 </resources>

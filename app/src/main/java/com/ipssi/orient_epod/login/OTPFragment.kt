@@ -3,10 +3,14 @@ package com.ipssi.orient_epod.login
 import `in`.aabhasjindal.otptextview.OTPListener
 import android.content.Context
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -71,6 +75,7 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         apiOtp = resource.data
+                        Log.d("OTP", apiOtp ?: "null")
                         viewModel.isLoading.value = false
                     }
                     Status.ERROR -> {
@@ -179,8 +184,17 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
     private fun updateTextUI() {
         val minute = (timeMilliSeconds / 1000) / 60
         val seconds = (timeMilliSeconds / 1000) % 60
-        if (isVisible)
-            binding.textViewTimeLeft.text = "I didn't receive OTP. Resend in ${String.format("%02d:%02d", minute, seconds)}"
+        if (isVisible) {
+            val timerMessage = String.format(getString(R.string.timer_message), minute, seconds)
+            val spannable = SpannableStringBuilder(timerMessage)
+            spannable.setSpan(
+                    ForegroundColorSpan(resources.getColor(R.color.colorBlueStripFont)),
+                    timerMessage.indexOf("Resend"),
+                    timerMessage.length,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+            )
+            binding.textViewTimeLeft.text = spannable
+        }
     }
 
     private fun updateTextUIFinish() {

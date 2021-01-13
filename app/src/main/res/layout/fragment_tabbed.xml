@@ -82,6 +82,7 @@
                         android:clickable="@{viewModel.isEditable}"
                         android:focusableInTouchMode="@{viewModel.isEditable}"
                         android:inputType="number"
+                        android:maxLength="6"
                         android:singleLine="true"
                         android:text="@={viewModel.bagsReceived}" />
 
@@ -107,6 +108,7 @@
                             android:clickable="@{viewModel.isEditable}"
                             android:focusableInTouchMode="@{viewModel.isEditable}"
                             android:inputType="number"
+                            android:maxLength="6"
                             android:singleLine="true"
                             android:text="@={viewModel.damageBags}" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -169,16 +171,19 @@
                 <CheckBox
                     android:id="@+id/chech_box_complete_trip"
                     android:layout_width="wrap_content"
+                    app:buttonTint="@color/colorPrimary"
                     android:layout_height="wrap_content"
                     android:checked="@{viewModel.isCompleteTripChecked}"
-                    android:text="@string/want_to_complete_trip" />
+                    android:text="@string/want_to_complete_trip"
+                    android:textColor="@color/black" />
+c
 
-
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/btn_submit"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_marginTop="10dp"
+                    android:textStyle="bold"
                     android:layout_marginEnd="2dp"
                     android:layout_weight="1"
                     android:background="@drawable/button_background_selector"

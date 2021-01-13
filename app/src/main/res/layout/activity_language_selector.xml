@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:scaleType="centerInside"
-        android:src="@drawable/humsafar"
+        android:src="@drawable/orient_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_20"
         android:text="@string/choose_language"
+        android:textColor="@color/colorBlueStripFont"
         android:textSize="@dimen/text_heading"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo_hamsafar" />
@@ -47,9 +48,9 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="15dp"
         android:paddingVertical="10dp"
-        android:background="#000000"
+        android:background="@drawable/btn_selector"
         android:text="@string/get_started"
-        android:textColor="@android:color/white"
+        android:textColor="@color/colorBlueStrip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

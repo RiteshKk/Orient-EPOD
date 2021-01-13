@@ -32,9 +32,11 @@
     <string name="download">डाउनलोड</string>
     <string name="invoices_for_epod">ईपीओडी के लिए चालान</string>
     <string name="logout">लॉग आउट</string>
-    <string name="bags_received">बैग प्राप्त किया</string>
+    <string name="bags_received">बैग/मात्रा प्राप्त किया</string>
+    <string name="bags_received_for_standard">बैग प्राप्त किया</string>
     <string name="remarks">टिप्पणी (यदि कोई हो)</string>
     <string name="bags_damage">कमी / नुकसान (बैग / मात्रा)</string>
+    <string name="bags_damage_for_standard">कमी / नुकसान बैग</string>
     <string name="total_shortage">कुल कमी / नुकसान (बैग / MT)</string>
     <string name="scan_doc">स्कैन दस्तावेज़ यदि कोई हो</string>
     <string name="upload_image">तस्वीर डालिये</string>

@@ -31,9 +31,11 @@
     <string name="download">డౌన్‌లోడ్</string>
     <string name="invoices_for_epod">EPOD కోసం ఇన్వాయిస్లు</string>
     <string name="logout">లాగ్ అవుట్</string>
-    <string name="bags_received">సంచులు స్వీకరించబడ్డాయి</string>
+    <string name="bags_received">అందుకున్న బ్యాగులు/పరిమాణం</string>
+    <string name="bags_received_for_standard">అందుకున్న బ్యాగులు</string>
     <string name="remarks">వ్యాఖ్యలు (ఏదైనా ఉంటే)</string>
     <string name="bags_damage">కొరత / నష్టం (బ్యాగులు / క్యూటి)</string>
+    <string name="bags_damage_for_standard">కొరత / నష్టం బ్యాగులు</string>
     <string name="total_shortage">మొత్తం కొరత / నష్టం (బాగ్ / MT)</string>
     <string name="scan_doc">పత్రాలు ఏదైనా ఉంటే స్కాన్ చేయండి</string>
     <string name="upload_image">చిత్రాన్ని అప్‌లోడ్ చేయండి</string>

@@ -31,16 +31,18 @@
     <string name="download">डाउनलोड करा</string>
     <string name="invoices_for_epod">ईपीओडीसाठी पावत्या</string>
     <string name="logout">बाहेर पडणे</string>
-    <string name="bags_received">बॅग प्राप्त</string>
+    <string name="bags_received">प्राप्त पिशव्या/मात्रा</string>
+    <string name="bags_received_for_standard">प्राप्त पिशव्या</string>
     <string name="remarks">शेरा (काही असल्यास)</string>
     <string name="bags_damage">टंचाई / नुकसान (बॅग / क्वाटीटी)</string>
+    <string name="bags_damage_for_standard">टंचाई / नुकसान बॅग</string>
     <string name="total_shortage">एकूण कमतरता / नुकसान (बॅग / एमटी)</string>
     <string name="scan_doc">कागदपत्रे असल्यास काही स्कॅन करा</string>
     <string name="upload_image">प्रतिमा अपलोड करा</string>
     <string name="submit_epod">ईपीओडी जमा करा</string>
     <string name="cancel">रद्द करा</string>
     <string name="clear">स्वच्छ</string>
-    <string name="uploading_image">अपलोड करीत आहे...</string>
+    <string name="uploading_image">अपलोड करीत आहे&#8230;</string>
     <string name="uploaded">अपलोड केले.</string>
     <string name="max_3_allowed">कमाल 3 चित्रांना परवानगी आहे</string>
 

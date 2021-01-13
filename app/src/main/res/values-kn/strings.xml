@@ -31,16 +31,18 @@
     <string name="download">ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</string>
     <string name="invoices_for_epod">ಇಪಿಒಡಿಗಾಗಿ ಇನ್ವಾಯ್ಸ್ಗಳು</string>
     <string name="logout">ಲಾಗ್ ಔಟ್</string>
-    <string name="bags_received">ಚೀಲಗಳನ್ನು ಸ್ವೀಕರಿಸಲಾಗಿದೆ</string>
+    <string name="bags_received">ಸ್ವೀಕರಿಸಿದ ಚೀಲಗಳು/ಪ್ರಮಾಣ</string>
+    <string name="bags_received_for_standard">ಸ್ವೀಕರಿಸಿದ ಚೀಲಗಳು</string>
     <string name="remarks">ಟೀಕೆಗಳು (ಯಾವುದಾದರೂ ಇದ್ದರೆ)</string>
     <string name="bags_damage">ಕೊರತೆ / ಹಾನಿ (ಚೀಲಗಳು / ಕ್ಯೂಟಿ)</string>
+    <string name="bags_damage_for_standard">ಕೊರತೆ / ಹಾನಿ ಚೀಲಗಳು</string>
     <string name="total_shortage">ಒಟ್ಟು ಕೊರತೆ / ಹಾನಿ (ಬ್ಯಾಗ್ / ಎಂಟಿ)</string>
     <string name="scan_doc">ದಾಖಲೆಗಳು ಯಾವುದಾದರೂ ಇದ್ದರೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ</string>
     <string name="upload_image">ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ</string>
     <string name="submit_epod">ಇಪಿಒಡಿ ಸಲ್ಲಿಸಿ</string>
     <string name="cancel">ರದ್ದು</string>
     <string name="clear">ಸ್ಪಷ್ಟ</string>
-    <string name="uploading_image">ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...</string>
+    <string name="uploading_image">ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ&#8230;</string>
     <string name="uploaded">ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗಿದೆ.</string>
     <string name="max_3_allowed">ಗರಿಷ್ಠ 3 ಚಿತ್ರಗಳನ್ನು ಅನುಮತಿಸಲಾಗಿದೆ</string>
 

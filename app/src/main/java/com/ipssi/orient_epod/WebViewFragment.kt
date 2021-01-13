@@ -38,6 +38,7 @@ import java.net.URL
 private const val ARG_PARAM1 = "param1"
 
 class WebViewFragment : Fragment() {
+    private var snackBar: Snackbar? = null
     private lateinit var permissionStatus: SharedPreferences
     private lateinit var binding: FragmentWebViewBinding
 
@@ -79,9 +80,10 @@ class WebViewFragment : Fragment() {
             binding.progressView.progress = newProgress
             if (newProgress == 100) {
                 if (progressCounter == 2) {
-                    Snackbar.make(lr_view_layout, AppConstant.GENERIC_ERROR, Snackbar.LENGTH_INDEFINITE).setAction("Retry") {
+                    snackBar = Snackbar.make(lr_view_layout, AppConstant.GENERIC_ERROR, Snackbar.LENGTH_INDEFINITE).setAction("Retry") {
                         loadWebview()
-                    }.show()
+                    }
+                    snackBar?.show()
                 }
                 binding.progressView.visibility = View.GONE
             }
@@ -124,7 +126,7 @@ class WebViewFragment : Fragment() {
             val fileName = link?.substringAfterLast("/")
             PRDownloader.download(link, folder.path, fileName).build().start(object : OnDownloadListener {
                 override fun onDownloadComplete() {
-                    Snackbar.make(binding.root, "File Saved at : ${folder.path}/$fileName", Snackbar.LENGTH_INDEFINITE).show()
+                    Snackbar.make(binding.root, "File Saved at : ${folder.path}/$fileName", Snackbar.LENGTH_LONG).show()
                 }
 
                 override fun onError(error: Error?) {
@@ -166,6 +168,10 @@ class WebViewFragment : Fragment() {
         }
     }
 
+    override fun onDestroy() {
+        snackBar?.dismiss()
+        super.onDestroy()
+    }
 
     companion object {
         @JvmStatic

@@ -28,16 +28,16 @@
         <activity
             android:name=".LanguageSelectorActivity"
             android:screenOrientation="nosensor"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/customNoActionBar" />
         <activity
             android:name=".InvoiceDetailsActivity"
             android:label=""
             android:screenOrientation="nosensor"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/noActionBarHalfScreenBG" />
         <activity
             android:name=".SplashActivity"
             android:screenOrientation="nosensor"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:theme="@style/splash_background_style">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

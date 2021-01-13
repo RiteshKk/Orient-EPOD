@@ -1,6 +1,7 @@
 package com.ipssi.orient_epod
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.DialogInterface
 import android.content.Intent
@@ -31,6 +32,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
+
         binding = FragmentMainBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         binding.viewModel = viewModel

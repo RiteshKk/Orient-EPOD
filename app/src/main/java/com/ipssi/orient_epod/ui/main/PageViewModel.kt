@@ -3,7 +3,6 @@ package com.ipssi.orient_epod.ui.main
 import android.graphics.Bitmap
 import android.location.Location
 import android.util.Base64
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +14,6 @@ import com.ipssi.orient_epod.remote.util.AppConstant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 

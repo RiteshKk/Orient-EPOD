@@ -16,11 +16,11 @@
             android:layout_alignParentEnd="true" />
 
         <ProgressBar
+            android:id="@+id/progress_view"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
-            android:id="@+id/progress_view"
-            android:layout_alignParentTop="true"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:theme="@style/progressBar" />
 
 
@@ -30,11 +30,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:background="@color/colorGreen"
-            android:textAllCaps="true"
+            android:background="@color/colorPrimary"
             android:gravity="center"
             android:paddingVertical="@dimen/dp_15"
             android:text="@string/download"
-            android:textColor="@android:color/white" />
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
     </RelativeLayout>
 </layout>
