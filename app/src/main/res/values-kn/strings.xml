@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Orient-EPOD</string>
+    <string name="app_name">Driver App</string>
     <string name="customer_name">ಗ್ರಾಹಕ ಹೆಸರು</string>
     <string name="customer_address">ಗ್ರಾಹಕರ ವಿಳಾಸ</string>
     <string name="destination">ತಲುಪುವ ದಾರಿ</string>

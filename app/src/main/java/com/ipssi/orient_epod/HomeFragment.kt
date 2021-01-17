@@ -32,7 +32,6 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-
         binding = FragmentMainBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         binding.viewModel = viewModel

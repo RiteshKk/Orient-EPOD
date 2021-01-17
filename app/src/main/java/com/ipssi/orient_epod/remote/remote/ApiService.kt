@@ -31,6 +31,6 @@ interface ApiService {
     suspend fun saveDriverLocation(@Body driverLocationEntity: DriverLocationEntity): Any
 
     @GET(SEND_OTP)
-    suspend fun getOTP(@Path("phone") mobileNumber: String): Response<String>
+    suspend fun getOTP(@Path("phone") mobileNumber: String): Response<ResponseBody>
 }
 

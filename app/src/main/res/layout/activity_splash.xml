@@ -4,43 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/screen_full_bg"
     tools:context=".SplashActivity">
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="50dp"
         android:scaleType="centerInside"
-        android:src="@drawable/orient_cement_logo"
-        app:layout_constraintBottom_toTopOf="@id/logo_ck_group"
+        android:src="@drawable/orient_logo"
+        app:layout_constraintBottom_toTopOf="@id/logo_hamsafar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.7"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/logo_ck_group"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dp_30"
         android:scaleType="centerInside"
-        android:layout_marginHorizontal="@dimen/dp_50"
-        android:src="@drawable/ck_birla_small"
-        app:layout_constraintVertical_bias="0.4"
+        android:src="@drawable/ck_birla_group"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintVertical_bias="0.4" />
 
     <ImageView
         android:id="@+id/logo_hamsafar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="centerInside"
-        android:src="@drawable/humsafar"
+        android:src="@drawable/a1_humsafar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo_ck_group" />
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,6 +16,7 @@ import com.ipssi.orient_epod.remote.util.AppConstant.SERVER_ERROR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.xml.sax.ErrorHandler
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -58,19 +59,12 @@ class SharedViewModel : ViewModel() {
             try {
                 val driverOTP = ApiHelper(ApiClient.getApiService()).getDriverOTP(mobileNumber)
                 if (driverOTP.isSuccessful) {
-                    otpLiveData.postValue(Resource.success(driverOTP.body()))
+                    otpLiveData.postValue(Resource.success(driverOTP.body()?.string()))
                 } else {
                     otpLiveData.postValue(Resource.error(null, GENERIC_ERROR))
                 }
-            } catch (ex: Exception) {
-                when (ex) {
-                    is IOException -> {
-                        otpLiveData.postValue(Resource.offline(null, OFFLINE_ERROR))
-                    }
-                    else -> {
-                        otpLiveData.postValue(Resource.error(null, GENERIC_ERROR))
-                    }
-                }
+            } catch (ex: Throwable) {
+                otpLiveData.postValue(Resource.error(null, GENERIC_ERROR))
             }
         }
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Orient-EPOD</string>
+    <string name="app_name">Driver App</string>
     <string name="choose_language">एक भाषा चुनें</string>
     <string name="customer_name">ग्राहक का नाम</string>
     <string name="customer_address">ग्राहक का पता</string>

@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -20,7 +22,8 @@ import com.ipssi.orient_epod.R
 import com.ipssi.orient_epod.callbacks.OnLoginListener
 import com.ipssi.orient_epod.databinding.FragmentLoginBinding
 import com.ipssi.orient_epod.hideKeyboard
-import com.ipssi.orient_epod.smsreceiver.MySMSBroadcastReceiver
+import com.ipssi.orient_epod.remote.remote.util.Status
+import com.ipssi.orient_epod.showAlertDialog
 
 
 class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
@@ -49,9 +52,27 @@ class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewModel()
+        observeModel()
         initializedHintRequest()
         addTextWatcher()
         handleClick()
+    }
+
+    private fun handleClick() {
+        binding.btnLogin.setOnClickListener {
+            onButtonClick()
+        }
+        binding.truckNumber.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                onButtonClick()
+                true
+            }
+            if (event != null && event.action == KeyEvent.KEYCODE_ENTER) {
+                onButtonClick()
+                true
+            }
+            false
+        }
     }
 
     private fun setupViewModel() {
@@ -60,39 +81,70 @@ class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
         binding.viewModel = viewModel
     }
 
-    private fun handleClick() {
-        binding.btnLogin.setOnClickListener {
-            hideKeyboard(binding.root, requireContext())
-            var hasError = false
-            val mNumber = binding.mobileNumber.text.toString()
-            val vehicleName = binding.truckNumber.text.toString()
+    private fun onButtonClick() {
+        hideKeyboard(binding.root, requireContext())
+        var hasError = false
+        val mNumber = binding.mobileNumber.text.toString()
+        val vehicleName = binding.truckNumber.text.toString()
 
-            if (mNumber.isEmpty()) {
-                binding.mobileNumber.error = getString(R.string.field_cant_be_empty)
-                hasError = true
-            } else if (mNumber.startsWith("+91", ignoreCase = true) && mNumber.length != 13 || mNumber.startsWith("+91", ignoreCase = true).not() && mNumber.length != 10) {
-                binding.mobileNumber.error = getString(R.string.invalid_number)
-                hasError = true
-            } else if (vehicleName.isEmpty()) {
-                binding.truckNumber.error = getString(R.string.field_cant_be_empty)
-                hasError = true
-            }
-            if (hasError.not()) {
-                viewModel.mobileNumber = mNumber
-                viewModel.vehicle = vehicleName
-                loginListener.showOTPView()
-            }
+        if (mNumber.isEmpty()) {
+            binding.mobileNumber.error = getString(R.string.field_cant_be_empty)
+            hasError = true
+        } else if (mNumber.length != 10) {
+            binding.mobileNumber.error = getString(R.string.invalid_number)
+            hasError = true
+        } else if (vehicleName.isEmpty()) {
+            binding.truckNumber.error = getString(R.string.field_cant_be_empty)
+            hasError = true
         }
+        if (hasError.not()) {
+            viewModel.mobileNumber = "+91$mNumber"
+            viewModel.vehicle = vehicleName
+            viewModel.getOTP()
+        }
+    }
+
+    private fun observeModel() {
+        viewModel.otpLiveData.observe(viewLifecycleOwner, {
+            it.let { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        val apiOtp = resource.data
+                        if (apiOtp?.length == 4) {
+                            Log.d("otp", apiOtp)
+                            loginListener.showOTPView()
+                        } else {
+                            showAlertDialog(requireActivity(), apiOtp)
+                        }
+                        viewModel.isLoading.value = false
+                    }
+                    Status.ERROR -> {
+                        viewModel.isLoading.value = false
+                        showAlertDialog(requireActivity(), resource.message)
+                    }
+                    Status.LOADING -> {
+                        viewModel.isLoading.value = true
+                    }
+                    Status.OFFLINE -> {
+                        viewModel.isLoading.value = false
+                        showAlertDialog(requireActivity(), resource.message)
+                    }
+                }
+            }
+        })
     }
 
     private fun addTextWatcher() {
         binding.mobileNumber.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+            }
+
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 binding.mobileNumber.error = null
             }
 
-            override fun afterTextChanged(s: Editable) {}
+            override fun afterTextChanged(s: Editable) {
+            }
         })
         binding.truckNumber.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -109,8 +161,10 @@ class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RESOLVE_HINT && resultCode == AppCompatActivity.RESULT_OK) {
             val credential: Credential? = data?.getParcelableExtra(Credential.EXTRA_KEY)
-            val selectedMobileNumber = credential?.id
+            var selectedMobileNumber = credential?.id
             Log.d("MainActivity", "$selectedMobileNumber")
+            selectedMobileNumber = selectedMobileNumber?.replace("+91","")
+            selectedMobileNumber=selectedMobileNumber?.removePrefix("0")
             binding.mobileNumber.setText(selectedMobileNumber)
         }
     }

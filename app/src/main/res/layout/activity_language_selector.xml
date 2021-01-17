@@ -24,7 +24,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_20"
         android:text="@string/choose_language"
-        android:textColor="@color/colorBlueStripFont"
+        android:fontFamily="@font/barlow_medium"
+        android:textColor="@color/colorRedStripFont"
         android:textSize="@dimen/text_heading"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo_hamsafar" />
@@ -35,10 +36,11 @@
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/dp_20"
         android:layout_marginBottom="10dp"
+        tools:listitem="@layout/language_view"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/btn_get_started"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btn_get_started"
         app:layout_constraintTop_toBottomOf="@id/language_selection_heading" />
 
 
@@ -46,13 +48,15 @@
         android:id="@+id/btn_get_started"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/btn_selector"
         android:paddingHorizontal="15dp"
         android:paddingVertical="10dp"
-        android:background="@drawable/btn_selector"
+        android:fontFamily="@font/barlow_medium"
         android:text="@string/get_started"
-        android:textColor="@color/colorBlueStrip"
+        android:textColor="@color/colorButtonFont"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

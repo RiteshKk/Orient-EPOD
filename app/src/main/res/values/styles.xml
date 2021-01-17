@@ -4,8 +4,9 @@
         <!--        Theme.AppCompat.Light.DarkActionBar">-->
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDarkNew</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:fontFamily">@font/barlow_medium</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -40,6 +41,6 @@
     </style>
 
     <style name="splash_background_style" parent="AppTheme.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash_bg</item>
+        <item name="android:windowBackground">@drawable/screen_full_bg</item>
     </style>
 </resources>

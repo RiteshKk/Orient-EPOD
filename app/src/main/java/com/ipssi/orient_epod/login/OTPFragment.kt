@@ -30,13 +30,15 @@ import com.ipssi.orient_epod.remote.util.AppConstant
 import com.ipssi.orient_epod.showAlertDialog
 import com.ipssi.orient_epod.smsreceiver.MySMSBroadcastReceiver
 import kotlinx.android.synthetic.main.fragment_otp.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
     private lateinit var binding: FragmentOtpBinding
     private lateinit var viewModel: SharedViewModel
     private var smsReceiver: MySMSBroadcastReceiver? = null
     var timeMilliSeconds = 0L
-    var apiOtp: String? = null
     private lateinit var loginListener: OnLoginListener
 
 
@@ -61,7 +63,6 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
         super.onViewCreated(view, savedInstanceState)
         setupViewModel()
         observeModel()
-        sendOTP()
         initializeViews()
     }
 
@@ -74,8 +75,6 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
             it.let { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
-                        apiOtp = resource.data
-                        Log.d("OTP", apiOtp ?: "null")
                         viewModel.isLoading.value = false
                     }
                     Status.ERROR -> {
@@ -118,7 +117,7 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
             }
 
             override fun onOTPComplete(otp: String) {
-                if (otp.equals(apiOtp, ignoreCase = true)) {
+                if (otp.equals(viewModel.otpLiveData.value?.data, ignoreCase = true)) {
                     requireActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).edit()
                             .putString(AppConstant.VEHICLE_NUMBER, viewModel.vehicle)
                             .putString(AppConstant.MOBILE_1, viewModel.mobileNumber)
@@ -185,15 +184,7 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
         val minute = (timeMilliSeconds / 1000) / 60
         val seconds = (timeMilliSeconds / 1000) % 60
         if (isVisible) {
-            val timerMessage = String.format(getString(R.string.timer_message), minute, seconds)
-            val spannable = SpannableStringBuilder(timerMessage)
-            spannable.setSpan(
-                    ForegroundColorSpan(resources.getColor(R.color.colorBlueStripFont)),
-                    timerMessage.indexOf("Resend"),
-                    timerMessage.length,
-                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
-            )
-            binding.textViewTimeLeft.text = spannable
+            binding.textViewTimeLeft.text = String.format(getString(R.string.timer_message), minute, seconds)
         }
     }
 

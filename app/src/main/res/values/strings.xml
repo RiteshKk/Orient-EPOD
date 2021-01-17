@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Orient-EPOD</string>
+    <string name="app_name">Driver App</string>
     <string name="customer_name">Customer Name</string>
     <string name="customer_address">Customer Address</string>
     <string name="destination">Destination</string>
@@ -75,6 +75,5 @@
     <string name="enter_otp">Waiting for OTP</string>
     <string name="title_bags">Bags</string>
     <string name="title_mt">MT</string>
-    <string name="send_otp">Send OTP</string>
-    <string name="timer_message">I didn\'t receive OTP. Resend in %02d:%02d</string>
+    <string name="timer_message">Resend OTP in %02d:%02d Sec</string>
 </resources>

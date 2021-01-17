@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity(), OnLoginListener {
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(binding.toolbar)
         val preferences = getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)

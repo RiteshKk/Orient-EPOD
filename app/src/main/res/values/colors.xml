@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#ec1c24</color>
-    <color name="colorPrimaryDarkNew">#eb3c1e</color>
+    <color name="colorPrimary">#156db4</color>
+    <color name="colorPrimaryDark">#156db4</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="colorGreyLight">#bdbdbe</color>
     <color name="colorTransparentGreyLight">#8FBDBDBE</color>
     <color name="colorGreyDark">#6e6f71</color>
-    <color name="colorBlueStrip">#0000a3</color>
-    <color name="colorBlueStripFont">#faf032</color>
-    <color name="colorEditTextBG">#e5e5e5</color>
-    <color name="colorHint">#999999</color>
+    <color name="colorRedStrip">#e40613</color>
+    <color name="colorRedStripFont">#fbe202</color>
+    <color name="colorEditTextBG">#ededed</color>
+    <color name="colorHint">#b4b2b3</color>
     <color name="colorText">#5e6e73</color>
+    <color name="colorButtonFont">#2c2170</color>
 
 </resources>

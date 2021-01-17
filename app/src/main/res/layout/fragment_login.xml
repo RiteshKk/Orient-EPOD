@@ -33,33 +33,80 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@color/colorBlueStrip"
+            android:background="@color/colorRedStrip"
+            android:fontFamily="@font/barlow_semibold"
             android:gravity="center"
             android:padding="7dp"
             android:text="@string/driver_portal"
-            android:textColor="@color/colorBlueStripFont"
+            android:textColor="@color/colorRedStripFont"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/birla_logo" />
 
+        <TextView
+            android:id="@+id/mobile_number_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:fontFamily="@font/barlow_medium"
+            android:text="@string/mobile_number"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_driver_portal" />
 
-        <EditText
-            android:id="@+id/mobile_number"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/number_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/dp_40"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/circular_bg"
-            android:gravity="center"
-            android:hint="@string/mobile_number"
-            android:inputType="number"
-            android:maxLength="13"
-            android:padding="10dp"
-            android:singleLine="true"
+            android:paddingHorizontal="@dimen/dp_20"
+           android:paddingVertical="@dimen/dp_10"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_driver_portal" />
+            app:layout_constraintTop_toBottomOf="@id/mobile_number_title">
+
+            <TextView
+                android:id="@+id/code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/barlow_medium"
+                android:text="+91"
+                android:textSize="@dimen/sp_18"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/mobile_number"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/barlow_medium"
+                android:gravity="start"
+                android:inputType="number"
+                android:maxLength="10"
+                android:background="@android:color/transparent"
+                android:singleLine="true"
+                app:layout_constraintStart_toEndOf="@id/code"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/truck_number_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/barlow_medium"
+            android:text="@string/truck_number"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/number_layout" />
 
 
         <EditText
@@ -67,17 +114,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/dp_40"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/circular_bg"
-            android:gravity="center"
-            android:hint="@string/truck_number"
+            android:fontFamily="@font/barlow_medium"
+            android:gravity="start"
+            android:hint="e.g. TN01AB1234"
             android:inputType="textCapCharacters"
-            android:padding="10dp"
+            android:paddingHorizontal="@dimen/dp_20"
+            android:paddingVertical="11dp"
             android:singleLine="true"
             android:textAllCaps="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mobile_number" />
+            app:layout_constraintTop_toBottomOf="@id/truck_number_title" />
 
 
         <TextView
@@ -87,10 +136,11 @@
             android:layout_marginTop="40dp"
             android:background="@drawable/btn_selector"
             android:enabled="@{viewModel.isLoading?false:true}"
+            android:fontFamily="@font/barlow_medium"
             android:paddingHorizontal="80dp"
-            android:paddingVertical="12dp"
-            android:text="@string/send_otp"
-            android:textColor="@color/colorBlueStrip"
+            android:paddingVertical="10dp"
+            android:text="@string/login"
+            android:textColor="@color/colorButtonFont"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -100,9 +150,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/dp_50"
+            android:fontFamily="@font/barlow_medium"
             android:text='@string/our_vision'
             android:textColor="@color/white"
             android:textSize="@dimen/sp_18"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

@@ -14,6 +14,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
+        android:background="@drawable/screen_full_bg"
         android:layout_height="match_parent">
 
         <TextView
@@ -24,6 +25,7 @@
             android:textColor="@color/white"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:fontFamily="@font/barlow_medium"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -35,9 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:textColor="@color/white"
-            app:box_margin_left="5dp"
-            app:box_margin_right="5dp"
+            android:textColor="@color/colorPrimary"
+            app:box_margin_left="6dp"
+            app:box_margin_right="6dp"
             app:height="40dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -45,7 +47,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_otp"
             app:length="4"
-            app:otp_box_background="@drawable/rounded_corner_green_border"
+            app:otp_box_background="@drawable/rounded_corner_white_border"
             app:otp_text_size="22dp"
             app:width="40dp" />
 
@@ -53,6 +55,7 @@
             android:id="@+id/textViewTimeLeft"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/barlow_medium"
             android:layout_marginTop="28dp"
             android:gravity="center"
             android:text="I didn't receive OTP. Resend in 00:57"
@@ -67,6 +70,7 @@
             android:background="@color/colorTransparentGreyLight"
             android:clickable="true"
             android:focusable="true"
+            tools:visibility="gone"
             android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}">
 
             <ProgressBar

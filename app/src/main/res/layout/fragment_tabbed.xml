@@ -34,6 +34,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/barlow_medium"
                     android:hint="@string/name">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -43,6 +44,7 @@
                         android:focusable="@{viewModel.isEditable}"
                         android:focusableInTouchMode="@{viewModel.isEditable}"
                         android:singleLine="true"
+                        android:fontFamily="@font/barlow_medium"
                         android:text="@={viewModel.name}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -52,6 +54,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/barlow_medium"
                     android:layout_marginTop="@dimen/dp_10"
                     android:hint="@string/mobile"
                     app:prefixText="+91">
@@ -63,6 +66,7 @@
                         android:focusableInTouchMode="@{viewModel.isEditable}"
                         android:inputType="number"
                         android:maxLength="10"
+                        android:fontFamily="@font/barlow_medium"
                         android:singleLine="true"
                         android:text="@={viewModel.mobile}" />
 
@@ -74,11 +78,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_10"
+                    android:fontFamily="@font/barlow_medium"
                     android:hint="@string/bags_received">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/barlow_medium"
                         android:clickable="@{viewModel.isEditable}"
                         android:focusableInTouchMode="@{viewModel.isEditable}"
                         android:inputType="number"
@@ -100,6 +106,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1.2"
+                        android:fontFamily="@font/barlow_medium"
                         android:hint="@string/bags_damage">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -109,6 +116,7 @@
                             android:focusableInTouchMode="@{viewModel.isEditable}"
                             android:inputType="number"
                             android:maxLength="6"
+                            android:fontFamily="@font/barlow_medium"
                             android:singleLine="true"
                             android:text="@={viewModel.damageBags}" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -120,12 +128,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="3dp"
                         android:layout_weight="0.5"
+                        android:fontFamily="@font/barlow_medium"
                         android:hint="@string/load_type">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:clickable="false"
+                            android:fontFamily="@font/barlow_medium"
                             android:focusableInTouchMode="false"
                             android:singleLine="true" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -135,6 +145,7 @@
                     android:id="@+id/layout_notes"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
+                    android:fontFamily="@font/barlow_medium"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_10"
                     android:hint="@string/remarks">
@@ -142,6 +153,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/barlow_medium"
                         android:clickable="@{viewModel.isEditable}"
                         android:focusableInTouchMode="@{viewModel.isEditable}"
                         android:text="@={viewModel.remarks}" />
@@ -153,6 +165,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp_10"
                     android:layout_marginTop="10dp"
+                    android:fontFamily="@font/barlow_medium"
                     android:layout_marginBottom="10dp"
                     android:text="@string/sign"
                     android:textSize="@dimen/sp_14" />
@@ -173,10 +186,10 @@
                     android:layout_width="wrap_content"
                     app:buttonTint="@color/colorPrimary"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/barlow_medium"
                     android:checked="@{viewModel.isCompleteTripChecked}"
                     android:text="@string/want_to_complete_trip"
                     android:textColor="@color/black" />
-c
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/btn_submit"
@@ -186,6 +199,7 @@ c
                     android:textStyle="bold"
                     android:layout_marginEnd="2dp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/barlow_medium"
                     android:background="@drawable/button_background_selector"
                     android:gravity="center"
                     android:paddingVertical="10dp"
@@ -216,6 +230,7 @@ c
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dp_10"
                         android:hint="@string/total_shortage"
+                        android:fontFamily="@font/barlow_medium"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -224,6 +239,7 @@ c
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:clickable="false"
+                            android:fontFamily="@font/barlow_medium"
                             android:focusableInTouchMode="false"
                             android:inputType="number"
                             android:singleLine="true" />
@@ -236,6 +252,7 @@ c
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dp_25"
                         android:text="@string/scan_doc"
+                        android:fontFamily="@font/barlow_medium"
                         android:textSize="14sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/total_damage" />
@@ -249,6 +266,7 @@ c
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="5dp"
                         android:text="@string/upload_image"
+                        android:fontFamily="@font/barlow_medium"
                         android:textColor="@android:color/white"
                         android:textSize="14sp"
                         app:layout_constraintBottom_toBottomOf="@id/scan_doc_label"

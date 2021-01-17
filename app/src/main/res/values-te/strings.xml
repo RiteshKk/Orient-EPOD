@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Orient-EPOD</string>
+    <string name="app_name">Driver App</string>
     <string name="customer_name">వినియోగదారుని పేరు</string>
     <string name="customer_address">కస్టమర్ చిరునామా</string>
     <string name="destination">గమ్యం</string>
@@ -42,7 +42,7 @@
     <string name="submit_epod">EPOD ని సమర్పించండి</string>
     <string name="cancel">రద్దు చేయు</string>
     <string name="clear">క్లియర్</string>
-    <string name="uploading_image">అప్‌లోడ్ అవుతోంది...</string>
+    <string name="uploading_image">అప్‌లోడ్ అవుతోంది&#8230;</string>
     <string name="uploaded">అప్‌లోడ్ చేయబడింది.</string>
     <string name="max_3_allowed">మాక్స్ 3 పిక్చర్స్ అనుమతించబడతాయి</string>
 

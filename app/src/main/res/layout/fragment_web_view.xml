@@ -31,6 +31,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:background="@color/colorPrimary"
+            android:fontFamily="@font/barlow_medium"
             android:gravity="center"
             android:paddingVertical="@dimen/dp_15"
             android:text="@string/download"
