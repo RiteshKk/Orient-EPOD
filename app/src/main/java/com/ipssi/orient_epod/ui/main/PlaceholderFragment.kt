@@ -95,7 +95,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
     }
 
     private fun setupForLastReceiver() {
-        val index = arguments!!.getInt(AppConstant.INDEX, 0)
+        val index = arguments?.getInt(AppConstant.INDEX, 0)
         if (index == 3) {
             viewModel.isCompleteTripChecked.value = true
             binding.chechBoxCompleteTrip.setOnClickListener {
@@ -118,12 +118,13 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
     private fun init() {
         val receiver: Receiver? = arguments?.getParcelable(AppConstant.RECEIVER)
         binding.totalDamage.editText?.setText(InvoiceDetailsActivity.totalDamage.toString())
-        if (invoice!!.loadType.equals("Standard", ignoreCase = true)) {
+        if (invoice?.loadType.equals("Standard", ignoreCase = true)) {
             binding.loadType.editText?.setText(R.string.title_bags)
             binding.layoutBags.hint = getString(R.string.bags_received_for_standard)
             binding.layoutDamageBags.hint = getString(R.string.bags_damage_for_standard)
         } else {
             binding.loadType.editText?.setText(R.string.title_mt)
+            binding.layoutDamageBags.isEnabled = false
             binding.layoutBags.hint = getString(R.string.actual_weightment)
             binding.layoutBags.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             binding.layoutDamageBags.editText?.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
@@ -169,21 +170,21 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                     }
                 }
                 try {
-                    if (!invoice!!.loadType.equals("standard", ignoreCase = true)) {
-                        if (InvoiceDetailsActivity.totalQuantity / 20f < InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toInt()) {
+                    if (!invoice?.loadType.equals("standard", ignoreCase = true)) {
+                        if (InvoiceDetailsActivity.totalQuantity / 20f < InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toFloat()) {
                             hasError = true
-                            binding.layoutBags.error = "You have only " + (InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " bags available"
+                            binding.layoutBags.error = "You have only " + ((InvoiceDetailsActivity.totalQuantity / 20f) - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " bags available"
                         } else {
                             val totalQuality = InvoiceDetailsActivity.totalQuantity / 20f - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage)
                             val enteredValue = s.toFloat()
                             val remainingBags = totalQuality - enteredValue
                             val df = DecimalFormat("###.###")
-                            if (remainingBags < 0) {
+                            if (remainingBags < 0f) {
                                 hasError = true
                                 binding.layoutDamageBags.error = "You have only $totalQuality bags available"
                             } else {
-                                binding.layoutDamageBags.editText!!.setText(df.format(remainingBags.toDouble()))
-                                binding.totalDamage.editText!!.setText(df.format(remainingBags.toDouble()))
+                                binding.layoutDamageBags.editText?.setText(df.format(remainingBags.toDouble()))
+                                binding.totalDamage.editText?.setText(df.format(remainingBags.toDouble()))
                                 binding.layoutBags.error = null
                             }
                         }
@@ -192,6 +193,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                         binding.layoutBags.error = "You have only " + (InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " bags available"
                     }
                 } catch (e: Exception) {
+                    Log.e("exception", "exception : ${e.message}")
                 }
             }
         })
@@ -374,7 +376,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
         if (hasError) {
             return
         }
-        if (isFinalSubmit && !invoice!!.loadType.equals("standard", ignoreCase = true)) {
+        if (isFinalSubmit && !invoice?.loadType.equals("standard", ignoreCase = true)) {
             val damageBagsValue = binding.layoutDamageBags.editText?.text.toString()
             val receivedBagsValue = binding.layoutBags.editText?.text.toString()
             var damagedBags = 0f
@@ -389,8 +391,8 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
             } catch (ex: Exception) {
                 Log.e("receivedBags Error", ex.message!!)
             }
-            if (InvoiceDetailsActivity.totalQuantity.toFloat() != InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags) {
-                Snackbar.make(binding.root, "${InvoiceDetailsActivity.totalQuantity.minus(InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags)} bags still not delivered. Please deliver all bags before completing trip", Snackbar.LENGTH_LONG).show()
+            if ((InvoiceDetailsActivity.totalQuantity / 20f) != InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags) {
+                Snackbar.make(binding.root, "${InvoiceDetailsActivity.totalQuantity / 20f - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags)} bags still not delivered. Please deliver all bags before completing trip", Snackbar.LENGTH_LONG).show()
                 return
             }
         }
@@ -405,7 +407,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                 return
             }
         }
-        if (!invoice!!.loadType.equals("standard", ignoreCase = true)) {
+        if (!invoice?.loadType.equals("standard", ignoreCase = true)) {
             if (isFinalSubmit && (viewModel.imageList.value == null || viewModel.imageList.value!!.data == null || viewModel.imageList.value?.data?.size == 0)) {
                 Snackbar.make(binding.root, "Document list is empty. Please scan document", Snackbar.LENGTH_LONG).show()
                 return
@@ -466,13 +468,13 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
             }
             viewModel.saveReceiver(id, invoice.invoiceNumber, if (invoice.loadType.equals("standard", ignoreCase = true)) 0 else 1, loc, isFinalSubmit)
         }
-        locationApi!!.onStop()
+        locationApi?.onStop()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 102 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            locationApi!!.onStart()
+            locationApi?.onStart()
         } else if (requestCode == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             dispatchTakePictureIntent()
         }
@@ -492,7 +494,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
             val invoice: Invoice = arguments?.getParcelable(AppConstant.INVOICE) ?: Invoice()
             viewModel.uploadImage(bitmap!!, invoice)
         } else if (requestCode == 102 && resultCode == Activity.RESULT_OK) {
-            locationApi!!.onStart()
+            locationApi?.onStart()
         }
     }
 

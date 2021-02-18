@@ -26,8 +26,6 @@ import java.util.*
  */
 class LocationScanningService : Service() {
     private var retrieveLocationService: RetrieveLocationService? = null
-    private val mData: MutableList<String> =
-        ArrayList()
     private var searchTimestamp: Long = 0
     private val TAG = this.javaClass.name
     private var timer: Timer? = null
