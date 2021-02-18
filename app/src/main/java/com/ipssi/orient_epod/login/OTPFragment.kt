@@ -3,36 +3,26 @@ package com.ipssi.orient_epod.login
 import `in`.aabhasjindal.otptextview.OTPListener
 import android.content.Context
 import android.content.IntentFilter
-import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.auth.api.phone.SmsRetriever
 import com.ipssi.orient_epod.R
 import com.ipssi.orient_epod.callbacks.OnLoginListener
 import com.ipssi.orient_epod.databinding.FragmentOtpBinding
-import com.ipssi.orient_epod.hideKeyboard
 import com.ipssi.orient_epod.remote.remote.util.Status
 import com.ipssi.orient_epod.remote.util.AppConstant
-import com.ipssi.orient_epod.showAlertDialog
 import com.ipssi.orient_epod.smsreceiver.MySMSBroadcastReceiver
 import kotlinx.android.synthetic.main.fragment_otp.*
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
     private lateinit var binding: FragmentOtpBinding
@@ -63,6 +53,7 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
         super.onViewCreated(view, savedInstanceState)
         setupViewModel()
         observeModel()
+        sendOTP()
         initializeViews()
     }
 
