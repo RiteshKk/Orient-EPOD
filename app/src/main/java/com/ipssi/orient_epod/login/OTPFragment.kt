@@ -53,7 +53,6 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
         super.onViewCreated(view, savedInstanceState)
         setupViewModel()
         observeModel()
-        sendOTP()
         initializeViews()
     }
 
