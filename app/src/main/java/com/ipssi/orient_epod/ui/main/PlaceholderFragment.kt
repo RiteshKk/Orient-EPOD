@@ -188,9 +188,23 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                                 binding.layoutBags.error = null
                             }
                         }
-                    } else if (InvoiceDetailsActivity.totalQuantity < InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toLong()) {
-                        hasError = true
-                        binding.layoutBags.error = "You have only " + (InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " bags available"
+                    } else {
+                        val damageBags = viewModel.damageBags.value.let {
+                            if (it.isNullOrEmpty()) {
+                                0L
+                            } else {
+                                it.toLong()
+                            }
+                        }
+
+                        if (InvoiceDetailsActivity.totalQuantity.toLong() == InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toLong() + damageBags) {
+                            viewModel.isCompleteTripChecked.value = true
+                        } else if (s.isNotEmpty() && InvoiceDetailsActivity.totalQuantity.toLong() > InvoiceDetailsActivity.totalDeliveredQuantity.toLong() + InvoiceDetailsActivity.totalDamage.toLong() + s.toLong() + damageBags) {
+                            viewModel.isCompleteTripChecked.value = false
+                        } else if (InvoiceDetailsActivity.totalQuantity < InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toLong() + damageBags) {
+                            hasError = true
+                            binding.layoutBags.error = "You have only " + (InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity + damageBags)) + " bags available"
+                        }
                     }
                 } catch (e: Exception) {
                     Log.e("exception", "exception : ${e.message}")
@@ -200,9 +214,9 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
         viewModel.damageBags.observe(viewLifecycleOwner, { s: String ->
             binding.layoutDamageBags.error = null
             hasError = false
-            if (viewModel.isEditable.value!!) {
+            if (viewModel.isEditable.value == true) {
                 if (s.isNotEmpty()) {
-                    if (invoice!!.loadType.equals("standard", ignoreCase = true)) {
+                    if (invoice?.loadType.equals("standard", ignoreCase = true)) {
                         val receivedBagsValue = viewModel.bagsReceived.value
                         if (receivedBagsValue?.isNotEmpty() == true) {
                             val receivedBags = receivedBagsValue.toLong()
@@ -221,6 +235,10 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                                         "Only ${totalAvailable - receivedBags} bags available"
                                     }
                                 }
+                            } else if (totalAvailable.toLong() == (receivedBags + damageBags)) {
+                                viewModel.isCompleteTripChecked.value = true
+                            } else if (totalAvailable > (receivedBags + damageBags)) {
+                                viewModel.isCompleteTripChecked.value = false
                             }
                         } else {
                             hasError = true
