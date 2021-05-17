@@ -173,7 +173,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                     if (!invoice?.loadType.equals("standard", ignoreCase = true)) {
                         if (InvoiceDetailsActivity.totalQuantity / 20f < InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toFloat()) {
                             hasError = true
-                            binding.layoutBags.error = "You have only " + ((InvoiceDetailsActivity.totalQuantity / 20f) - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " bags available"
+                            binding.layoutBags.error = "You have only " + ((InvoiceDetailsActivity.totalQuantity / 20f) - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " MT available"
                         } else {
                             val totalQuality = InvoiceDetailsActivity.totalQuantity / 20f - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage)
                             val enteredValue = s.toFloat()
@@ -181,7 +181,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                             val df = DecimalFormat("###.###")
                             if (remainingBags < 0f) {
                                 hasError = true
-                                binding.layoutDamageBags.error = "You have only $totalQuality bags available"
+                                binding.layoutDamageBags.error = "You have only $totalQuality MT available"
                             } else {
                                 binding.layoutDamageBags.editText?.setText(df.format(remainingBags.toDouble()))
                                 binding.totalDamage.editText?.setText(df.format(remainingBags.toDouble()))
@@ -410,7 +410,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                 Log.e("receivedBags Error", ex.message!!)
             }
             if ((InvoiceDetailsActivity.totalQuantity / 20f) != InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags) {
-                Snackbar.make(binding.root, "${InvoiceDetailsActivity.totalQuantity / 20f - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags)} bags still not delivered. Please deliver all bags before completing trip", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, "${InvoiceDetailsActivity.totalQuantity / 20f - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags)} MT still not delivered. Please deliver all bags before completing trip", Snackbar.LENGTH_LONG).show()
                 return
             }
         }
