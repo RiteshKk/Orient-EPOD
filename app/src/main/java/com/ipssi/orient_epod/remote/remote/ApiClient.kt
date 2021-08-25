@@ -1,16 +1,11 @@
 package com.ipssi.orient_epod.remote.remote
 
-import com.ipssi.orient_epod.remote.util.BASE_URL
-import okhttp3.ConnectionSpec
+import com.ipssi.orient_epod.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.security.GeneralSecurityException
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLContext
-import javax.net.ssl.SSLSocketFactory
-import javax.net.ssl.X509TrustManager
 
 
 object ApiClient {
@@ -24,7 +19,7 @@ object ApiClient {
 
     private fun getRetrofit(): Retrofit {
         val builder: Retrofit.Builder = Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
 
         return builder.client(getHttpClient()).build()

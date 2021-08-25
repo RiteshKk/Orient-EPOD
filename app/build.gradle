@@ -2,17 +2,27 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
+    signingConfigs {
+        release_signin_config {
+            storeFile file('E:\\AndroidProjects\\orient_keystore.jks')
+            storePassword 'Orient@123'
+            keyAlias 'Orient'
+            keyPassword 'Orient@123'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.ipssi.orient_epod"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 7
+        versionName "1.0.4"
         multiDexEnabled true
         android.buildFeatures.dataBinding = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -26,6 +36,22 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BASE_URL", URL_PROD
+        }
+        stage {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BASE_URL", URL_STAGE
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BASE_URL", URL_PROD
+        }
+        dev {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BASE_URL", URL_DEV
         }
     }
 }
@@ -67,9 +93,14 @@ dependencies {
 
     implementation 'com.github.aabhasr1:OtpView:v1.1.2-ktx'
 
-    implementation ("com.github.bumptech.glide:glide:4.11.0") {
+    implementation("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
     }
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
+
+    implementation platform('com.google.firebase:firebase-bom:28.0.1')
+
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
 }

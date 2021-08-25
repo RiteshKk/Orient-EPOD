@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ipssi.orient_epod.remote.remote.ApiClient
 import com.ipssi.orient_epod.model.Credentials
 import com.ipssi.orient_epod.model.DriverShipmentDao
+import com.ipssi.orient_epod.model.EpodResponse
 import com.ipssi.orient_epod.remote.remote.util.Resource
 import com.ipssi.orient_epod.remote.repository.ApiHelper
 import com.ipssi.orient_epod.remote.util.AppConstant
@@ -26,7 +27,7 @@ class SharedViewModel : ViewModel() {
     lateinit var mobileNumber: String
     var isLoading = MutableLiveData<Boolean>().apply { value = false }
     var shipmentDetailsData = MutableLiveData<Resource<DriverShipmentDao>>()
-    var otpLiveData = MutableLiveData<Resource<String?>>()
+    var otpLiveData = MutableLiveData<Resource<EpodResponse>>()
 
     fun getShipmentDetails(credentials: Credentials) {
         Log.d("getShipmentDetails", credentials.toString())
@@ -58,10 +59,10 @@ class SharedViewModel : ViewModel() {
             otpLiveData.postValue(Resource.loading(null))
             try {
                 val driverOTP = ApiHelper(ApiClient.getApiService()).getDriverOTP(mobileNumber)
-                if (driverOTP.isSuccessful) {
-                    otpLiveData.postValue(Resource.success(driverOTP.body()?.string()))
+                if (driverOTP.status.equals("1", ignoreCase = true)) {
+                    otpLiveData.postValue(Resource.success(driverOTP))
                 } else {
-                    otpLiveData.postValue(Resource.error(null, GENERIC_ERROR))
+                    otpLiveData.postValue(Resource.error(null, driverOTP.message))
                 }
             } catch (ex: Throwable) {
                 otpLiveData.postValue(Resource.error(null, GENERIC_ERROR))

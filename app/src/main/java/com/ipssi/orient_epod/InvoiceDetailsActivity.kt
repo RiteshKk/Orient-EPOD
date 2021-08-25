@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.appbar.AppBarLayout
@@ -27,31 +28,33 @@ class InvoiceDetailsActivity : AppCompatActivity() {
     private lateinit var viewModel: InvoiceDetailsViewModel
     override fun onDestroy() {
         super.onDestroy()
-        totalDamage = 0
-        totalQuantity = 0
-        totalDeliveredQuantity = 0
+        totalDamage = 0f
+        totalQuantity = 0f
+        totalDeliveredQuantity = 0f
     }
 
+    lateinit var model: Invoice
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_invoice_details)
-        binding.collapsingToolbar.contentScrim = resources.getDrawable(R.drawable.screen_full_bg)
+        binding.collapsingToolbar.contentScrim = ContextCompat.getDrawable(this,R.drawable.screen_full_bg)
         viewModel = ViewModelProvider(this).get(InvoiceDetailsViewModel::class.java)
         setSupportActionBar(binding.toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.lifecycleOwner = this
-        val model: Invoice = intent.getParcelableExtra(AppConstant.MODEL) ?: Invoice()
+        model = intent.getParcelableExtra(AppConstant.MODEL) ?: Invoice()
+        intent.extras?.clear()
         totalQuantity = try {
-            (20 * model.invoiceQuantity.trim { it <= ' ' }.toFloat()).toInt()
+            (20 * model.invoiceQuantity.trim { it <= ' ' }.toFloat())
         } catch (e: Exception) {
             Log.e("NumberFormatException", e.message!!)
-            0
+            0f
         }
         val address = StringBuilder()
-        if (model.shiptopartyAddress != null && model.shiptopartyAddress.isNotEmpty()) {
+        if (model.shiptopartyAddress.isNotEmpty()) {
             address.append(model.shiptopartyAddress)
         }
-        if (model.shiptopartyAddress1 != null && model.shiptopartyAddress1.isNotEmpty()) {
+        if (model.shiptopartyAddress1.isNotEmpty()) {
             address.append(if (address.isNotEmpty()) "\n" else "")
             address.append(model.shiptopartyAddress1)
         }
@@ -81,7 +84,6 @@ class InvoiceDetailsActivity : AppCompatActivity() {
         viewModel.receiversList.observe(this, { (status, data, message) ->
             when (status) {
                 Status.SUCCESS -> {
-                    val model: Invoice = intent.getParcelableExtra(AppConstant.MODEL) ?: Invoice()
                     val fragments = ArrayList<PlaceholderFragment>()
                     var i = 0
                     while (data != null && i < data.size) {
@@ -140,8 +142,8 @@ class InvoiceDetailsActivity : AppCompatActivity() {
     }
 
     companion object {
-        var totalDamage = 0
-        var totalQuantity = 0
-        var totalDeliveredQuantity = 0
+        var totalDamage : Float = 0f
+        var totalQuantity : Float = 0f
+        var totalDeliveredQuantity : Float = 0f
     }
 }

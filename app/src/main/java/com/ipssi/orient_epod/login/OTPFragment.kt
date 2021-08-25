@@ -101,13 +101,13 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
                 startTimer()
             }
         }
-        binding.otpView.setOnTouchListener { _, _ -> true }
+//        binding.otpView.setOnTouchListener { _, _ -> true }
         binding.otpView.otpListener = object : OTPListener {
             override fun onInteractionListener() {
             }
 
             override fun onOTPComplete(otp: String) {
-                if (otp.equals(viewModel.otpLiveData.value?.data, ignoreCase = true)) {
+                if (otp.equals(viewModel.otpLiveData.value?.data?.message, ignoreCase = true)) {
                     requireActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).edit()
                             .putString(AppConstant.VEHICLE_NUMBER, viewModel.vehicle)
                             .putString(AppConstant.MOBILE_1, viewModel.mobileNumber)
@@ -149,6 +149,7 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
 
             task.addOnFailureListener {
                 // Fail to start API
+                it.message?.let { it1 -> Log.e("addOnFailureListener", it1) }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -157,7 +158,7 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
     }
 
     private fun startTimer() {
-        val timer = object : CountDownTimer(60000, 1000) {
+        val timer = object : CountDownTimer(120000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 timeMilliSeconds = millisUntilFinished
                 updateTextUI()
@@ -188,10 +189,14 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
     override fun onOTPReceived(otp: String) {
         val finalOTP = otp.substring(0, 4)
         Log.v("OTPReceived", finalOTP)
-        if (isVisible) {
-            binding.otpView.setOTP(finalOTP)
-            if (smsReceiver != null) {
-                LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(smsReceiver!!)
+        viewModel.otpLiveData.value?.data?.message.let {
+            if (it.equals(finalOTP, true)) {
+                if (isVisible) {
+                    binding.otpView.setOTP(finalOTP)
+                    if (smsReceiver != null) {
+                        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(smsReceiver!!)
+                    }
+                }
             }
         }
     }

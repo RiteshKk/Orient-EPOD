@@ -62,6 +62,10 @@
     <string name="required_permission_title">Required Permission</string>
     <string name="accept">Accept</string>
     <string name="close">Close</string>
-    <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul><li>&nbsp;Location to capture appropriate delivery point and delivery visibility to our customer.</li><li>&nbsp;Camera and Storage to facilitate you upload stamped invoice copy.</li></ul>]]></string>
+    <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul>
+    <li>&nbsp;Location to capture last mile delivery point.</li>
+    <li>&nbsp;Background Location, even when the app is closed, to provide visibility of orders in transit to our customers.</li>
+    <li>&nbsp;Background Location will start after Login the app and will stop on Logout.</li>
+    </ul>]]></string>
     <string name="all_invoices_complete">అన్ని ఇన్ వాయిస్ లు పూర్తయ్యాయి, లాగ్ అవుట్</string>
 </resources>

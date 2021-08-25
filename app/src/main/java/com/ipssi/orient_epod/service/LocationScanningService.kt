@@ -1,5 +1,6 @@
 package com.ipssi.orient_epod.service
 
+import android.R.attr.description
 import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -15,7 +16,6 @@ import com.ipssi.orient_epod.OrientApp
 import com.ipssi.orient_epod.R
 import com.ipssi.orient_epod.location.CoreUtility.Companion.getNotificationChannel
 import com.ipssi.orient_epod.location.CoreUtility.Companion.isLocationOn
-import com.ipssi.orient_epod.location.LocationAPI
 import com.ipssi.orient_epod.location.RetrieveLocationService
 import com.ipssi.orient_epod.remote.util.AppConstant
 import java.util.*
@@ -33,10 +33,10 @@ class LocationScanningService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("[onCreate]","service started")
+        Log.d("[onCreate]", "service started")
         createNotificationChannel()
         val notification =
-            getNotification(AppConstant.NOTIFICATION_DESC)
+                getNotification(AppConstant.NOTIFICATION_DESC)
         startForeground(NOTIF_ID, notification)
         searchTimestamp = System.currentTimeMillis()
     }
@@ -52,13 +52,13 @@ class LocationScanningService : Service() {
             channel.setShowBadge(false)
             channel.description = AppConstant.NOTIFICATION_DESC
             val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
 
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         serviceRunning = true
         configureNotification()
@@ -82,30 +82,32 @@ class LocationScanningService : Service() {
     private fun getNotification(notificationDescText: String): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivities(
-            this,
-            0,
-            arrayOf(notificationIntent),
-            PendingIntent.FLAG_UPDATE_CURRENT
+                this,
+                0,
+                arrayOf(notificationIntent),
+                PendingIntent.FLAG_UPDATE_CURRENT
         )
         val channelId =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) getNotificationChannel() else ""
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) getNotificationChannel() else ""
+
         val notificationBuilder =
-            NotificationCompat.Builder(this, channelId)
+                NotificationCompat.Builder(this, channelId)
         val bigTextStyle =
-            NotificationCompat.BigTextStyle()
+                NotificationCompat.BigTextStyle()
         bigTextStyle.setBigContentTitle(resources.getString(R.string.app_name))
         bigTextStyle.bigText(notificationDescText)
         return notificationBuilder
-            .setStyle(bigTextStyle)
-            .setContentTitle(resources.getString(R.string.app_name))
-            .setContentText(notificationDescText)
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .setSound(null)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setColor(resources.getColor(R.color.colorPrimary))
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .build()
+                .setStyle(bigTextStyle)
+                .setContentTitle(resources.getString(R.string.app_name))
+                .setContentText(notificationDescText)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setSound(null)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setColor(resources.getColor(R.color.colorPrimary))
+                .setSmallIcon(R.mipmap.ic_launcher_background)
+                .build()
     }
 
     private fun startLocationUpdate() {
@@ -141,26 +143,26 @@ class LocationScanningService : Service() {
     }
 
     private val mLocationChangeListener: BroadcastReceiver? =
-        object : BroadcastReceiver() {
-            override fun onReceive(
-                context: Context,
-                intent: Intent
-            ) {
-                val action = intent.action
-                if (LocationManager.PROVIDERS_CHANGED_ACTION == action) {
-                   val notification = if (!isLocationOn(OrientApp.instance.applicationContext)) {
-                        getNotification(AppConstant.PLEASE_ALLOW_LOCATION)
-                    } else {
-                        getNotification(AppConstant.NOTIFICATION_DESC)
+            object : BroadcastReceiver() {
+                override fun onReceive(
+                        context: Context,
+                        intent: Intent
+                ) {
+                    val action = intent.action
+                    if (LocationManager.PROVIDERS_CHANGED_ACTION == action) {
+                        val notification = if (!isLocationOn(OrientApp.instance.applicationContext)) {
+                            getNotification(AppConstant.PLEASE_ALLOW_LOCATION)
+                        } else {
+                            getNotification(AppConstant.NOTIFICATION_DESC)
+                        }
+                        updateNotification(notification)
                     }
-                    updateNotification(notification)
                 }
             }
-        }
 
     private fun updateNotification(notification: Notification) {
         val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIF_ID, notification)
     }
 

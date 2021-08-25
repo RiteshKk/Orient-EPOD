@@ -30,11 +30,11 @@ class MainActivity : AppCompatActivity(), OnLoginListener {
         }
     }
 
-    private fun replaceFragment(fName: String, tag: String) {
+    private fun replaceFragment(fName: String, tag: String, otp: String?=null) {
         val fragmentManager = supportFragmentManager
         var frag = fragmentManager.findFragmentByTag(tag)
         if (frag == null) {
-            frag = fragmentManager.fragmentFactory.instantiate(classLoader, fName)
+            frag = supportFragmentManager.fragmentFactory.instantiate(classLoader, fName)
         }
         fragmentManager.beginTransaction().replace(R.id.container, frag, tag)
                 .commitAllowingStateLoss()

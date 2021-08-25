@@ -76,13 +76,14 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.lifecycleOwner = this
+
         permissionStatus = requireContext().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE)
         if (arguments != null) {
             invoice = arguments?.getParcelable(AppConstant.INVOICE)
         }
         viewModel = ViewModelProvider(this).get(PageViewModel::class.java)
         binding.viewModel = viewModel
+        binding.lifecycleOwner = this
         locationApi = LocationAPI(requireActivity(), this)
         init()
         setupForLastReceiver()
@@ -139,21 +140,26 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                 viewModel.bagsReceived.value = receiver.bagsRecv
                 viewModel.damageBags.value = receiver.shortage
                 viewModel.remarks.value = receiver.remarks
-                val decode = Base64.decode(receiver.sign, Base64.DEFAULT)
-                val bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.size)
-                viewModel.signature.value = bitmap
+                receiver.sign?.let {
+                    val decode = Base64.decode(it, Base64.DEFAULT)
+                    val bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.size)
+                    viewModel.signature.value = bitmap
+                }
+
                 viewModel.isEditable.value = false
             }
         }
     }
 
     private fun setObserver() {
-        viewModel.isEditable.observe(viewLifecycleOwner, { isEnabled: Boolean? -> binding.btnSubmit.isEnabled = isEnabled!! })
+        viewModel.isEditable.observe(viewLifecycleOwner, { isEnabled: Boolean? ->
+            binding.btnSubmit.isEnabled = isEnabled == true
+        })
         viewModel.isCompleteTripChecked.observe(viewLifecycleOwner, { isChecked: Boolean ->
             if (isChecked) {
                 binding.btnSubmit.isEnabled = true
             } else {
-                binding.btnSubmit.isEnabled = viewModel.isEditable.value!!
+                binding.btnSubmit.isEnabled = viewModel.isEditable.value ?: false
             }
         })
         viewModel.signature.observe(viewLifecycleOwner, { bitmap: Bitmap? -> binding.sign.setImageBitmap(bitmap) })
@@ -162,15 +168,15 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
         viewModel.bagsReceived.observe(viewLifecycleOwner, { s: String ->
             hasError = false
             binding.layoutBags.error = null
-            if (viewModel.isEditable.value!!) {
+            if (viewModel.isEditable.value == true) {
                 if (s.isEmpty()) {
-                    if (!invoice!!.loadType.equals("standard", ignoreCase = true)) {
+                    if (!"standard".equals(invoice?.loadType, ignoreCase = true)) {
                         binding.layoutDamageBags.editText?.setText("")
                         binding.totalDamage.editText?.setText("")
                     }
                 }
                 try {
-                    if (!invoice?.loadType.equals("standard", ignoreCase = true)) {
+                    if (!"standard".equals(invoice?.loadType, ignoreCase = true)) {
                         if (InvoiceDetailsActivity.totalQuantity / 20f < InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toFloat()) {
                             hasError = true
                             binding.layoutBags.error = "You have only " + ((InvoiceDetailsActivity.totalQuantity / 20f) - (InvoiceDetailsActivity.totalDamage + InvoiceDetailsActivity.totalDeliveredQuantity)) + " MT available"
@@ -197,7 +203,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                             }
                         }
 
-                        if (InvoiceDetailsActivity.totalQuantity.toLong() == InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toLong() + damageBags) {
+                        if (InvoiceDetailsActivity.totalQuantity == InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + s.toLong() + damageBags) {
                             viewModel.isCompleteTripChecked.value = true
                         } else if (s.isNotEmpty() && InvoiceDetailsActivity.totalQuantity.toLong() > InvoiceDetailsActivity.totalDeliveredQuantity.toLong() + InvoiceDetailsActivity.totalDamage.toLong() + s.toLong() + damageBags) {
                             viewModel.isCompleteTripChecked.value = false
@@ -216,29 +222,33 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
             hasError = false
             if (viewModel.isEditable.value == true) {
                 if (s.isNotEmpty()) {
-                    if (invoice?.loadType.equals("standard", ignoreCase = true)) {
+                    if ("standard".equals(invoice?.loadType, ignoreCase = true)) {
                         val receivedBagsValue = viewModel.bagsReceived.value
                         if (receivedBagsValue?.isNotEmpty() == true) {
                             val receivedBags = receivedBagsValue.toLong()
                             val damageBags = s.toLong()
                             val totalAvailable = InvoiceDetailsActivity.totalQuantity - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage)
-                            if (totalAvailable < (receivedBags + damageBags)) {
-                                hasError = true
-                                binding.layoutDamageBags.error = when {
-                                    totalAvailable - receivedBags < 0 -> {
-                                        "Only $totalAvailable bags available"
-                                    }
-                                    totalAvailable - receivedBags == 0L -> {
-                                        "All bags consumed. No bags available"
-                                    }
-                                    else -> {
-                                        "Only ${totalAvailable - receivedBags} bags available"
+                            when {
+                                totalAvailable < (receivedBags + damageBags) -> {
+                                    hasError = true
+                                    binding.layoutDamageBags.error = when {
+                                        totalAvailable - receivedBags < 0 -> {
+                                            "Only $totalAvailable bags available"
+                                        }
+                                        totalAvailable - receivedBags == 0f -> {
+                                            "All bags consumed. No bags available"
+                                        }
+                                        else -> {
+                                            "Only ${totalAvailable - receivedBags} bags available"
+                                        }
                                     }
                                 }
-                            } else if (totalAvailable.toLong() == (receivedBags + damageBags)) {
-                                viewModel.isCompleteTripChecked.value = true
-                            } else if (totalAvailable > (receivedBags + damageBags)) {
-                                viewModel.isCompleteTripChecked.value = false
+                                totalAvailable.toLong() == (receivedBags + damageBags) -> {
+                                    viewModel.isCompleteTripChecked.value = true
+                                }
+                                totalAvailable > (receivedBags + damageBags) -> {
+                                    viewModel.isCompleteTripChecked.value = false
+                                }
                             }
                         } else {
                             hasError = true
@@ -255,7 +265,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                 Status.OFFLINE -> showAlertDialog(requireActivity(), message, null)
                 Status.SUCCESS -> {
                     showSnackbar(getString(R.string.uploaded))
-                    adapter!!.setImages(viewModel.imageList.value!!.data)
+                    adapter?.setImages(viewModel.imageList.value?.data)
                 }
             }
         })
@@ -264,7 +274,8 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                 Status.ERROR, Status.OFFLINE -> showAlertDialog(requireActivity(), message, null)
                 Status.LOADING -> {
                 }
-                Status.SUCCESS -> Snackbar.make(binding.root, data!!.message, Snackbar.LENGTH_SHORT).show()
+                Status.SUCCESS -> Snackbar.make(binding.root, data?.message
+                        ?: "", Snackbar.LENGTH_SHORT).show()
             }
         })
         viewModel.imageList.observe(viewLifecycleOwner, { (status, data, message) ->
@@ -276,24 +287,24 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
                 }
                 Status.SUCCESS -> {
                     viewModel.isLoading.value = false
-                    adapter!!.setImages(data)
+                    adapter?.setImages(data)
                 }
             }
         })
         viewModel.saveReceiverResponse.observe(viewLifecycleOwner, { (status, data, message) ->
             when (status) {
                 Status.SUCCESS -> {
-                    Snackbar.make(binding.root, data!!.message, Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, data?.message ?: "", Snackbar.LENGTH_SHORT).show()
                     try {
-                        receiverId = data.status
-                        val totalDamage = binding.layoutDamageBags.editText!!.text.toString().trim { it <= ' ' }.toInt()
+                        data?.status?.let { receiverId = it }
+                        val totalDamage = binding.layoutDamageBags.editText?.text.toString().trim { it <= ' ' }.toInt()
                         InvoiceDetailsActivity.totalDamage += totalDamage
-                        InvoiceDetailsActivity.totalDeliveredQuantity += binding.layoutBags.editText!!.text.toString().trim { it <= ' ' }.toInt()
+                        InvoiceDetailsActivity.totalDeliveredQuantity += binding.layoutBags.editText?.text.toString().trim { it <= ' ' }.toInt()
                     } catch (e: NumberFormatException) {
                         Log.e("placeHolderFragment", "NumberFormatException->${e.localizedMessage}")
                     }
                     if (isFinalSubmit) {
-                        Handler(Looper.myLooper()!!).postDelayed({ requireActivity().finish() }, 2000
+                        Handler(Looper.getMainLooper()).postDelayed({ requireActivity().finish() }, 2000
                         )
                     }
                     binding.totalDamage.editText?.setText(InvoiceDetailsActivity.totalDamage.toString())
@@ -316,7 +327,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
             dialogFragment.show(childFragmentManager, "signature")
         }
         binding.btnSubmit.setOnClickListener {
-            if (viewModel.isCompleteTripChecked.value!!) {
+            if (viewModel.isCompleteTripChecked.value == true) {
                 isFinalSubmit = true
             }
             hideKeyboard(binding.root, requireContext())
@@ -367,12 +378,12 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(requireContext(),
                             Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                locationApi!!.onStart()
+                locationApi?.onStart()
             } else {
                 requestPermissions()
             }
         } else {
-            locationApi!!.onStart()
+            locationApi?.onStart()
         }
     }
 
@@ -402,12 +413,12 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
             try {
                 damagedBags = damageBagsValue.trim { it <= ' ' }.toFloat()
             } catch (e2: Exception) {
-                Log.e("damageBagsError", e2.message!!)
+                Log.e("damageBagsError", "${e2.message}")
             }
             try {
                 receivedBags = receivedBagsValue.trim { it <= ' ' }.toFloat()
             } catch (ex: Exception) {
-                Log.e("receivedBags Error", ex.message!!)
+                Log.e("receivedBags Error", "${ex.message}")
             }
             if ((InvoiceDetailsActivity.totalQuantity / 20f) != InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags) {
                 Snackbar.make(binding.root, "${InvoiceDetailsActivity.totalQuantity / 20f - (InvoiceDetailsActivity.totalDeliveredQuantity + InvoiceDetailsActivity.totalDamage + damagedBags + receivedBags)} MT still not delivered. Please deliver all bags before completing trip", Snackbar.LENGTH_LONG).show()
@@ -426,7 +437,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
             }
         }
         if (!invoice?.loadType.equals("standard", ignoreCase = true)) {
-            if (isFinalSubmit && (viewModel.imageList.value == null || viewModel.imageList.value!!.data == null || viewModel.imageList.value?.data?.size == 0)) {
+            if (isFinalSubmit && (viewModel.imageList.value == null || viewModel.imageList.value?.data == null || viewModel.imageList.value?.data?.size == 0)) {
                 Snackbar.make(binding.root, "Document list is empty. Please scan document", Snackbar.LENGTH_LONG).show()
                 return
             }
@@ -467,7 +478,7 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
     }
 
     private fun showSnackbar(mainTextString: String?) {
-        Snackbar.make(binding.root, mainTextString!!, Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(binding.root, mainTextString ?: "", Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onSignatureCaptured(bitmap: Bitmap, fileUri: String) {
@@ -508,9 +519,9 @@ class PlaceholderFragment : Fragment(), OnSignedCaptureListener, OnLocationChang
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
-            val bitmap = data!!.extras!!["data"] as Bitmap?
+            val bitmap = data?.extras?.get("data") as Bitmap?
             val invoice: Invoice = arguments?.getParcelable(AppConstant.INVOICE) ?: Invoice()
-            viewModel.uploadImage(bitmap!!, invoice)
+            bitmap?.let { viewModel.uploadImage(it, invoice) }
         } else if (requestCode == 102 && resultCode == Activity.RESULT_OK) {
             locationApi?.onStart()
         }

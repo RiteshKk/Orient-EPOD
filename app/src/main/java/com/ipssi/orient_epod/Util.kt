@@ -29,7 +29,7 @@ fun hideKeyboard(view: View, context: Context) {
 }
 
 fun formatTimeStamp(): String {
-    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault())
+    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.ENGLISH)
     return formatter.format(Date())
 }
 

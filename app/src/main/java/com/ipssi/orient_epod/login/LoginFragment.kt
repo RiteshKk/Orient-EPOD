@@ -18,12 +18,13 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.credentials.Credential
 import com.google.android.gms.auth.api.credentials.HintRequest
 import com.google.android.gms.common.api.GoogleApiClient
-import com.ipssi.orient_epod.R
+import com.ipssi.orient_epod.*
 import com.ipssi.orient_epod.callbacks.OnLoginListener
 import com.ipssi.orient_epod.databinding.FragmentLoginBinding
-import com.ipssi.orient_epod.hideKeyboard
 import com.ipssi.orient_epod.remote.remote.util.Status
-import com.ipssi.orient_epod.showAlertDialog
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
 class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
@@ -33,7 +34,6 @@ class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
     private lateinit var loginListener: OnLoginListener
 
     private val RESOLVE_HINT: Int = 1001
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -62,7 +62,7 @@ class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
         binding.btnLogin.setOnClickListener {
             onButtonClick()
         }
-        binding.truckNumber.setOnEditorActionListener { v, actionId, event ->
+        binding.truckNumber.setOnEditorActionListener { _, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 onButtonClick()
                 true
@@ -87,15 +87,19 @@ class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
         val mNumber = binding.mobileNumber.text.toString()
         val vehicleName = binding.truckNumber.text.toString()
 
-        if (mNumber.isEmpty()) {
-            binding.mobileNumber.error = getString(R.string.field_cant_be_empty)
-            hasError = true
-        } else if (mNumber.length != 10) {
-            binding.mobileNumber.error = getString(R.string.invalid_number)
-            hasError = true
-        } else if (vehicleName.isEmpty()) {
-            binding.truckNumber.error = getString(R.string.field_cant_be_empty)
-            hasError = true
+        when {
+            mNumber.isEmpty() -> {
+                binding.mobileNumber.error = getString(R.string.field_cant_be_empty)
+                hasError = true
+            }
+            mNumber.length != 10 -> {
+                binding.mobileNumber.error = getString(R.string.invalid_number)
+                hasError = true
+            }
+            vehicleName.isEmpty() -> {
+                binding.truckNumber.error = getString(R.string.field_cant_be_empty)
+                hasError = true
+            }
         }
         if (hasError.not()) {
             viewModel.mobileNumber = "+91$mNumber"
@@ -109,7 +113,7 @@ class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
             it.let { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
-                        val apiOtp = resource.data
+                        val apiOtp = resource.data?.message
                         if (apiOtp?.length == 4) {
                             Log.d("otp", apiOtp)
                             loginListener.showOTPView()
@@ -163,55 +167,11 @@ class LoginFragment : Fragment(), GoogleApiClient.ConnectionCallbacks {
             val credential: Credential? = data?.getParcelableExtra(Credential.EXTRA_KEY)
             var selectedMobileNumber = credential?.id
             Log.d("MainActivity", "$selectedMobileNumber")
-            selectedMobileNumber = selectedMobileNumber?.replace("+91","")
-            selectedMobileNumber=selectedMobileNumber?.removePrefix("0")
+            selectedMobileNumber = selectedMobileNumber?.replace("+91", "")
+            selectedMobileNumber = selectedMobileNumber?.removePrefix("0")
             binding.mobileNumber.setText(selectedMobileNumber)
         }
     }
-
-    /*private fun login() {
-        val mNumber = binding.mobileNumber.text.toString()
-        val vehicleName = binding.truckNumber.text.toString()
-        viewModel.getShipmentDetails(Credentials(transporterCode = null, vehicleNo = vehicleName, phone1 = mNumber
-                ?: "", phone2 = null))
-    }*/
-
-    /*   private fun observeModel() {
-           viewModel.shipmentDetailsData.observe(requireActivity(), {
-               it.let { resource ->
-                   when (resource.status) {
-                       SUCCESS -> {
-                           resource.data.let {
-                               if (resource.data?.invoices?.size ?: 0 > 0) {
-                                   val mNumber = binding.mobileNumber.text.toString()
-                                   requireActivity().getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE).edit()
-                                           .putString(AppConstant.VEHICLE_NUMBER, binding.truckNumber.text.toString())
-                                           .putString(AppConstant.SHIPMENT_NUMBER, resource.data?.invoices?.get(0)?.shipmentNumber)
-                                           .putString(AppConstant.MOBILE_1, mNumber)
-                                           .putBoolean(AppConstant.IS_LOGIN, true)
-                                           .apply()
-                                   loginListener.onLoginSuccess()
-                               } else {
-                                   Snackbar.make(binding.root, getString(R.string.no_records_found), Snackbar.LENGTH_LONG).show()
-                               }
-                           }
-                           viewModel.isLoading.value = false
-                       }
-                       LOADING -> {
-                           viewModel.isLoading.value = true
-                       }
-                       ERROR -> {
-                           viewModel.isLoading.value = false
-                           showAlertDialog(requireActivity(), resource.message)
-                       }
-                       OFFLINE -> {
-                           viewModel.isLoading.value = false
-                           showAlertDialog(requireActivity(), resource.message)
-                       }
-                   }
-               }
-           })
-       }*/
 
     private fun initializedHintRequest() {
         val hintRequest = HintRequest.Builder()

@@ -21,7 +21,11 @@
     <string name="required_permission_title">Required Permission</string>
     <string name="accept">Accept</string>
     <string name="close">Close</string>
-    <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul><li>&nbsp;Location to capture appropriate delivery point and delivery visibility to our customer.</li><li>&nbsp;Camera and Storage to facilitate you upload stamped invoice copy.</li></ul>]]></string>
+    <string name="exit" translatable="false">Exit</string>
+    <string name="required_permission_message"><![CDATA[We are taking following app permissions to make your experience better.<ul>
+    <li>&nbsp;Location to capture last mile delivery point.</li>
+    <li>&nbsp;Background Location, even when the app is closed, to provide visibility of orders in transit to our customers.</li>
+    <li>&nbsp;Background Location will start after Login the app and will stop on Logout.</li></ul>]]></string>
     <string name="driver_portal">Driver Portal</string>
     <string name="transporter_code">Transporter Code</string>
     <string name="receiver_1">Receiver#1</string>
@@ -69,11 +73,11 @@
     <string name="want_to_complete_trip">I want to complete this trip.</string>
     <string name="load_type">Load Type</string>
     <string name="all_invoices_complete">All Invoices completed, Logging out</string>
-    <string name="actual_weightment">Actual Weightment</string>
-    <string name="mobile_number">Mobile Number</string>
-    <string name="invalid_number">Invalid Number</string>
-    <string name="enter_otp">Waiting for OTP</string>
-    <string name="title_bags">Bags</string>
-    <string name="title_mt">MT</string>
-    <string name="timer_message">Resend OTP in %02d:%02d Sec</string>
+    <string name="actual_weightment" translatable="false">Actual Weightment</string>
+    <string name="mobile_number" translatable="false">Mobile Number</string>
+    <string name="invalid_number" translatable="false">Invalid Number</string>
+    <string name="enter_otp" translatable="false">Waiting for OTP</string>
+    <string name="title_bags" translatable="false">Bags</string>
+    <string name="title_mt" translatable="false">MT</string>
+    <string name="timer_message" translatable="false">Resend OTP in %02d:%02d Sec</string>
 </resources>

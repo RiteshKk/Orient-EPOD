@@ -7,7 +7,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
+import android.text.Html
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ipssi.orient_epod.adapter.InvoiceAdapter
@@ -23,6 +25,7 @@ import com.ipssi.orient_epod.model.Invoice
 import com.ipssi.orient_epod.remote.remote.util.Status
 import com.ipssi.orient_epod.remote.util.AppConstant
 import com.ipssi.orient_epod.service.LocationScanningService
+import java.lang.System.exit
 
 
 class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLocationListener {
@@ -65,7 +68,7 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == 2001 && grantResults[0] == PERMISSION_GRANTED) {
+        if (requestCode == 2001 && grantResults.isNotEmpty() && grantResults[0] == PERMISSION_GRANTED) {
             if (CoreUtility.isLocationOn(requireContext())) {
                 configureService(requireContext())
                 CoreUtility.startBackgroundWorker()
@@ -122,18 +125,12 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
                         resource.data.let { dao ->
                             if (dao?.invoices?.size ?: 0 > 0) {
                                 (binding.invoiceList.adapter as InvoiceAdapter).setData(dao?.invoices)
-                                // for Continuous Location update
-                                if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
-                                    if (CoreUtility.isLocationOn(requireContext())) {
-                                        val prefrences = requireActivity().getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)
-                                        prefrences.edit().putString(AppConstant.SHIPMENT_NUMBER, dao?.invoices?.get(0)?.shipmentNumber).apply()
-                                        configureService(requireContext())
-                                        CoreUtility.startBackgroundWorker()
-                                    } else {
-                                        CoreUtility.enableLocation(requireActivity(), this)
-                                    }
+                                val prefrences = requireActivity().getSharedPreferences(getString(R.string.app_name), MODE_PRIVATE)
+                                prefrences.edit().putString(AppConstant.SHIPMENT_NUMBER, dao?.invoices?.get(0)?.shipmentNumber).apply()
+                                if (!CoreUtility.isLocationPermissionAvailable(requireContext())) {
+                                    showPermissionDialog()
                                 } else {
-                                    CoreUtility.requestPermissions(this, 2001)
+                                    startLocationAccess()
                                 }
                             } else {
                                 (binding.invoiceList.adapter as InvoiceAdapter).setData(dao?.invoices)
@@ -164,6 +161,36 @@ class HomeFragment : Fragment(), OnInvoiceSelectedListener, LocationUtils.TurnLo
         if (isTurnOn) {
             configureService(requireContext())
             CoreUtility.startBackgroundWorker()
+        }
+    }
+
+    private fun showPermissionDialog() {
+        AlertDialog.Builder(requireContext())
+                .setTitle(R.string.required_permission_title)
+                .setMessage(Html.fromHtml(getString(R.string.required_permission_message)))
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok) { dialog: DialogInterface, _: Int ->
+                    startLocationAccess()
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.exit) { dialog: DialogInterface, _: Int ->
+                    logout(requireContext())
+                    dialog.dismiss()
+                }
+                .show()
+    }
+
+    private fun startLocationAccess() {
+        // for Continuous Location update
+        if (CoreUtility.isLocationPermissionAvailable(requireContext())) {
+            if (CoreUtility.isLocationOn(requireContext())) {
+                configureService(requireContext())
+                CoreUtility.startBackgroundWorker()
+            } else {
+                CoreUtility.enableLocation(requireActivity(), this)
+            }
+        } else {
+            CoreUtility.requestPermissions(this, 2001)
         }
     }
 

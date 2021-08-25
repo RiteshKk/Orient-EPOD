@@ -2,14 +2,20 @@ package com.ipssi.orient_epod.location
 
 import android.Manifest
 import android.app.Activity
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.LocationManager
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -93,8 +99,22 @@ class CoreUtility {
         }
 
 
+//        fun getNotificationChannel(): String {
+//            return AppConstant.NOTIFICATION_CHANNEL
+//        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
         fun getNotificationChannel(): String {
-            return AppConstant.NOTIFICATION_CHANNEL
+            val channelId = AppConstant.NOTIFICATION_CHANNEL
+            val channelName = "My Background Service"
+            val chan = NotificationChannel(channelId,
+                    channelName, NotificationManager.IMPORTANCE_HIGH)
+            chan.lightColor = Color.BLUE
+            chan.importance = NotificationManager.IMPORTANCE_HIGH
+            chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            val service = OrientApp.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            service.createNotificationChannel(chan)
+            return channelId
         }
 
 
@@ -133,7 +153,7 @@ class CoreUtility {
             }
         }
 
-        fun requestPermission(activity: Activity,permission: String,PERMISSION_REQUEST_CODE :Int) {
+        fun requestPermission(activity: Activity, permission: String, PERMISSION_REQUEST_CODE: Int) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                 Toast.makeText(activity, "Phone state permission allows us to get phone number. Please allow it for additional functionality.", Toast.LENGTH_LONG).show()
             }

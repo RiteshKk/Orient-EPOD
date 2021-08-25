@@ -57,13 +57,13 @@ class WebViewFragment : Fragment() {
 
         override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
             super.onReceivedError(view, errorCode, description, failingUrl)
-            Snackbar.make(lr_view_layout, description
+            Snackbar.make(binding.root, description
                     ?: AppConstant.GENERIC_ERROR, Snackbar.LENGTH_SHORT).show()
         }
 
         override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
             super.onReceivedError(view, request, error)
-            Snackbar.make(lr_view_layout, request?.toString()
+            Snackbar.make(binding.root, request?.toString()
                     ?: AppConstant.GENERIC_ERROR, Snackbar.LENGTH_SHORT).show()
         }
 
@@ -80,7 +80,7 @@ class WebViewFragment : Fragment() {
             binding.progressView.progress = newProgress
             if (newProgress == 100) {
                 if (progressCounter == 2) {
-                    snackBar = Snackbar.make(lr_view_layout, AppConstant.GENERIC_ERROR, Snackbar.LENGTH_INDEFINITE).setAction("Retry") {
+                    snackBar = Snackbar.make(binding.root, AppConstant.GENERIC_ERROR, Snackbar.LENGTH_INDEFINITE).setAction("Retry") {
                         loadWebview()
                     }
                     snackBar?.show()
