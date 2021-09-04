@@ -101,7 +101,7 @@ class OTPFragment : Fragment(), MySMSBroadcastReceiver.OTPReceiveListener {
                 startTimer()
             }
         }
-//        binding.otpView.setOnTouchListener { _, _ -> true }
+        binding.otpView.setOnTouchListener { _, _ -> true }
         binding.otpView.otpListener = object : OTPListener {
             override fun onInteractionListener() {
             }
